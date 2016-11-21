@@ -12,8 +12,7 @@ MMU::MMU(std::unique_ptr<Mapper> mapper) :
 
 BYTE MMU::readByte(WORD addr) {
 	// TODO
-	(void)addr;
-	return 0;
+	return mapper->readByte(addr);
 }
 
 WORD MMU::readWord(WORD addr) {
