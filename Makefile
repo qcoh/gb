@@ -18,7 +18,7 @@ TEST_OBJECTS:=$(patsubst $(TEST_DIR)/%.cpp, $(BUILD_DIR)/%.test.o, $(TEST_SOURCE
 DEPENDENCIES:=$(OBJECTS:.o=.d)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LFLAGS) -o $@
+	$(CC) $(OBJECTS) $(LFLAGS) -o $(BUILD_DIR)/$@
 
 
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
