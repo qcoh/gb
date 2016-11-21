@@ -12,7 +12,10 @@ SCENARIO("reading a WORD should have correct endianness", "[mmu]") {
 
 		WHEN("reading a WORD") {
 			WORD w = mmu.readWord(0);
-			REQUIRE(w == 0xff00);
+
+			THEN("WORD has correct endianess") {
+				REQUIRE(w == 0xff00);
+			}
 		}
 	}
 }
