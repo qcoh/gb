@@ -8,4 +8,5 @@
 class RomOnly : public Mapper {
 	public:
 		RomOnly(std::vector<BYTE>&&);
+		virtual BYTE readByte(WORD);
 };
