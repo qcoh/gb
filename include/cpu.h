@@ -13,4 +13,10 @@ class CPU {
 
 		WORD pc;
 		WORD sp;
+
+		template<class Writer, class Reader>
+		void LD(Writer& w, Reader& r) {
+			w.write(r.read());
+		}
+
 };
