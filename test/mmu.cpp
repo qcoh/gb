@@ -4,17 +4,16 @@
 #include "romonly.h"
 #include "mmu.h"
 
-SCENARIO("reading a WORD should have correct endianness", "[mmu]") {
-	GIVEN("a MMU containing a RomOnly containing a BYTE vector") {
-		std::vector<BYTE> v = {0x0, 0xff, 0xaa, 0xbb};
-		auto ptr = std::make_unique<RomOnly>(std::move(v));
+SCENARIO("reading a WORD (from bios) should have correct endianness", "[mmu]") {
+	GIVEN("a MMU containing an emptry RomOnly") {
+		auto ptr = std::make_unique<RomOnly>(std::vector<BYTE>{});
 		MMU mmu{std::move(ptr)};
 
 		WHEN("reading a WORD") {
-			WORD w = mmu.readWord(0);
+			WORD w = mmu.readWord(1);
 
 			THEN("WORD has correct endianess") {
-				REQUIRE(w == 0xff00);
+				REQUIRE(w == 0xfffe);
 			}
 		}
 	}
