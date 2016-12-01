@@ -24,11 +24,15 @@ MMU::MMU(std::unique_ptr<Mapper> mapper) :
 	biosMode{true}
 {
 	// unused error
-	(void)bios;
 	(void)biosMode;
 }
 
 BYTE MMU::readByte(WORD addr) {
+	if (0 <= addr && addr < 0x2000) {
+		if (biosMode && addr < 0x100) {
+			return bios[addr];
+		}
+	}
 	// TODO
 	return mapper->readByte(addr);
 }
