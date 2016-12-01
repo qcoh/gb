@@ -16,6 +16,6 @@ class MMU {
 		void writeWord(WORD, WORD);
 	private:
 		std::unique_ptr<Mapper> mapper;
-		std::array<BYTE, 256> bios;
+		static std::array<BYTE, 256> bios;
 		bool biosMode;
 };
