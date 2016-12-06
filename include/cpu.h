@@ -9,11 +9,25 @@ class CPU {
 		CPU(MMU&&);
 
 		void step();
-	private:
+	protected:
 		MMU mmu;
 
 		WORD pc;
 		WORD sp;
+
+		WORD af;
+		WORD bc;
+		WORD de;
+		WORD hl;
+
+		BYTE* a;
+		BYTE* f;
+		BYTE* b;
+		BYTE* c;
+		BYTE* d;
+		BYTE* e;
+		BYTE* h;
+		BYTE* l;
 
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;
