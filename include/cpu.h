@@ -2,6 +2,7 @@
 
 #include "mmu.h"
 #include "types.h"
+#include "instruction.h"
 
 class CPU {
 	public:
@@ -14,9 +15,6 @@ class CPU {
 		WORD pc;
 		WORD sp;
 
-		template<class Writer, class Reader>
-		void LD(Writer& w, Reader& r) {
-			w.write(r.read());
-		}
-
+		std::array<Instruction, 256> instructions;
+		std::array<Instruction, 256> extended;
 };
