@@ -8,4 +8,6 @@ struct Instruction {
 	BYTE opcode;
 	std::function<void(void)> f;
 	std::string description;
+	BYTE cycles;
+	BYTE offset;
 };

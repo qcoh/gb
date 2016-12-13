@@ -34,11 +34,11 @@ CPU::CPU(MMU&& mmu_) :
 	(void)l;
 
 	instructions = {{
-		{ 0x00, [](){}, "NOP" },
-		{ 0x03, std::bind(&CPU::INC, this, std::ref(bc)), "INC BC" },
-		{ 0x13, std::bind(&CPU::INC, this, std::ref(de)), "INC DE" },
-		{ 0x23, std::bind(&CPU::INC, this, std::ref(hl)), "INC HL" },
-		{ 0x33, std::bind(&CPU::INC, this, std::ref(sp)), "INC SP" },
+		{ 0x00, [](){}, "NOP", 4, 1 },
+		{ 0x03, std::bind(&CPU::INC, this, std::ref(bc)), "INC BC", 8, 1 },
+		{ 0x13, std::bind(&CPU::INC, this, std::ref(de)), "INC DE", 8, 1 },
+		{ 0x23, std::bind(&CPU::INC, this, std::ref(hl)), "INC HL", 8, 1 },
+		{ 0x33, std::bind(&CPU::INC, this, std::ref(sp)), "INC SP", 8, 1 },
 	}};
 }
 
