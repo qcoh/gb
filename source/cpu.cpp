@@ -33,11 +33,18 @@ CPU::CPU(MMU&& mmu_) :
 	(void)h;
 	(void)l;
 
-	instructions = {
-		{{0, {}, "test"}},
-	};
+	instructions = {{
+		{ 0x03, std::bind(&CPU::INC, this, std::ref(bc)), "INC BC" },
+		{ 0x13, std::bind(&CPU::INC, this, std::ref(de)), "INC DE" },
+		{ 0x23, std::bind(&CPU::INC, this, std::ref(hl)), "INC HL" },
+		{ 0x33, std::bind(&CPU::INC, this, std::ref(sp)), "INC SP" },
+	}};
 }
 
 void CPU::step() {
 
+}
+
+void CPU::INC(WORD& w) {
+	w++;
 }

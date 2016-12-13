@@ -3,6 +3,9 @@
 
 #include "cxxopts.hpp"
 #include "mapper.h"
+#include "cpu.h"
+
+void debugRepl(CPU&);
 
 int main(int argc, char *argv[]) {
 	cxxopts::Options options{"gb", "A GameBoy emulator"};
@@ -12,13 +15,27 @@ int main(int argc, char *argv[]) {
 	options.parse(argc, argv);
 
 	try {
+		auto debug = options["d"].as<bool>();
 		auto filename = options["f"].as<std::string>();
 		if (filename == "") {
 			throw std::runtime_error{"No rom"};
 		}
-		auto mapper = Mapper::fromFile(filename);
-		(void)mapper;
+
+		CPU cpu{Mapper::fromFile(filename)};
+		if (debug) {
+			debugRepl(cpu);
+		}
 	} catch (std::exception& e) {
 		std::cerr << e.what() << '\n';
+	}
+}
+
+void debugRepl(CPU& cpu) {
+	(void)cpu;
+	std::string s{};
+	for (;;) {
+		std::cout << "> ";
+		std::getline(std::cin, s);
+		std::cout << "  " << s << '\n';
 	}
 }

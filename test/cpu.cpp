@@ -29,3 +29,36 @@ SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 		}
 	}
 }
+
+class TestInstructionCPU : public CPU {
+	public:
+		TestInstructionCPU(MMU&& mmu_) : CPU(std::move(mmu_)) {
+		}
+
+		void call(BYTE op) {
+			for (auto& in : instructions) {
+				if (in.opcode == op) {
+					in.f();
+				}
+			}
+		}
+
+		WORD getBC() {
+			return bc;
+		}
+};
+
+SCENARIO("Testing instructions", "[cpu]") {
+	GIVEN("CPU-derivative with BC accessor") {
+		auto ptr = std::make_unique<RomOnly>(std::vector<BYTE>{});
+		TestInstructionCPU cpu{MMU{std::move(ptr)}};
+
+		WHEN("incrementing bc") {
+			cpu.call(0x03);
+
+			THEN("bc == 1") {
+				REQUIRE(cpu.getBC() == 1);
+			}
+		}
+	}
+}

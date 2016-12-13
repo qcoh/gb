@@ -31,4 +31,6 @@ class CPU {
 
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;
+
+		void INC(WORD&);
 };
