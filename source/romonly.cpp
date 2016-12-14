@@ -1,6 +1,6 @@
 #include "romonly.h"
 
-RomOnly::RomOnly(std::vector<BYTE>&& rom) : Mapper{std::move(rom)} {
+RomOnly::RomOnly(std::vector<BYTE>&& rom_) : Mapper{std::move(rom_)} {
 }
 
 BYTE RomOnly::readByte(WORD addr) {

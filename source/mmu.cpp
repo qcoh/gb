@@ -28,7 +28,7 @@ MMU::MMU(std::unique_ptr<Mapper> mapper_) :
 }
 
 BYTE MMU::readByte(WORD addr) {
-	if (0 <= addr && addr < 0x2000) {
+	if (/*0 <= addr &&*/ addr < 0x2000) {
 		if (biosMode && addr < 0x100) {
 			return bios[addr];
 		}
@@ -38,7 +38,7 @@ BYTE MMU::readByte(WORD addr) {
 }
 
 WORD MMU::readWord(WORD addr) {
-	return static_cast<WORD>(readByte(addr) | readByte(addr+1) << 8);
+	return static_cast<WORD>(readByte(addr) | readByte(static_cast<WORD>(addr+1)) << 8);
 }
 
 void MMU::writeByte(WORD addr, BYTE v) {
