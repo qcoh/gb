@@ -33,4 +33,5 @@ class CPU {
 		std::array<Instruction, 256> extended;
 
 		void INC(WORD&);
+		void DEC(WORD&);
 };

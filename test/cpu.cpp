@@ -60,5 +60,11 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getBC() == 1);
 			}
 		}
+		WHEN("decrementing bc") {
+			cpu.call(0x0b);
+			THEN("bc == 0xffff") {
+				REQUIRE(cpu.getBC() == 0xffff);
+			}
+		}
 	}
 }
