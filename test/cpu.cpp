@@ -34,6 +34,10 @@ class TestCPU : public CPU {
 		BYTE getB() {
 			return *b;
 		}
+
+		void setA(BYTE a_) {
+			*a = a_;
+		}
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
@@ -58,21 +62,21 @@ SCENARIO("Testing instructions", "[cpu]") {
 		TestCPU cpu{MMU{std::move(ptr)}};
 
 		WHEN("incrementing bc") {
-			cpu.call(0x03);
+			cpu.call(0x03); // INC BC
 
 			THEN("bc == 1") {
 				REQUIRE(cpu.getBC() == 1);
 			}
 		}
 		WHEN("decrementing bc") {
-			cpu.call(0x0b);
+			cpu.call(0x0b); // DEC BC
 			THEN("bc == 0xffff") {
 				REQUIRE(cpu.getBC() == 0xffff);
 			}
 		}
 		WHEN("loading immediate word") {
 			cpu.setNN(0xf0f0);
-			cpu.call(0x01);
+			cpu.call(0x01); // LD BC, nn
 
 			THEN("bc == 0xf0f0") {
 				REQUIRE(cpu.getBC() == 0xf0f0);
@@ -80,10 +84,18 @@ SCENARIO("Testing instructions", "[cpu]") {
 		}
 		WHEN("loading immediate byte") {
 			cpu.setN(0xaa);
-			cpu.call(0x06);
+			cpu.call(0x06); // LD B, n
 
 			THEN("b == 0xaa") {
 				REQUIRE(cpu.getB() == 0xaa);
+			}
+		}
+		WHEN("loading register from register") {
+			cpu.setA(0xbb);
+			cpu.call(0x47); // LD B, A
+
+			THEN("b == 0xbb") {
+				REQUIRE(cpu.getB() == 0xbb);
 			}
 		}
 	}
