@@ -26,6 +26,10 @@ class TestCPU : public CPU {
 		void setNN(WORD nn_) {
 			nn = nn_;
 		}
+		
+		void setN(BYTE n_) {
+			n = n_;
+		}
 
 		BYTE getB() {
 			return *b;
@@ -72,6 +76,14 @@ SCENARIO("Testing instructions", "[cpu]") {
 
 			THEN("bc == 0xf0f0") {
 				REQUIRE(cpu.getBC() == 0xf0f0);
+			}
+		}
+		WHEN("loading immediate byte") {
+			cpu.setN(0xaa);
+			cpu.call(0x06);
+
+			THEN("b == 0xaa") {
+				REQUIRE(cpu.getB() == 0xaa);
 			}
 		}
 	}

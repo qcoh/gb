@@ -39,5 +39,8 @@ class CPU {
 		void INC(WORD&);
 		void DEC(WORD&);
 
-		void LD(WORD&, const WORD&);
+		template <typename T>
+		void LD(T& target, const T& source) {
+			target = source;
+		}
 };
