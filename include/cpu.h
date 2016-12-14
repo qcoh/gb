@@ -29,9 +29,15 @@ class CPU {
 		BYTE* h;
 		BYTE* l;
 
+		// immediate byte/word
+		BYTE n;
+		WORD nn;
+
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;
 
 		void INC(WORD&);
 		void DEC(WORD&);
+
+		void LD(WORD&, const WORD&);
 };
