@@ -1,4 +1,6 @@
 #include <functional>
+#include <stdexcept>
+#include <iostream>
 #include "cpu.h"
 
 CPU::CPU(MMU&& mmu_) :
@@ -20,21 +22,6 @@ CPU::CPU(MMU&& mmu_) :
 	n{0},
 	nn{0}
 {
-	(void)pc;
-	(void)sp;
-	(void)af;
-	(void)bc;
-	(void)de;
-	(void)hl;
-	(void)a;
-	(void)f;
-	(void)b;
-	(void)c;
-	(void)d;
-	(void)e;
-	(void)h;
-	(void)l;
-
 	instructions = {{
 		{ 0x00, [](){}, "NOP", 4, 1 },
 		{ 0x01, std::bind(&CPU::LD<WORD>, 	this, std::ref(bc), std::cref(nn)), 	"LD BC, nn",	12, 3 },
@@ -135,7 +122,15 @@ CPU::CPU(MMU&& mmu_) :
 }
 
 void CPU::step() {
-
+	auto rb = mmu.readByte(pc);
+	auto& op = instructions[rb];
+	if (op.opcode == rb) {
+		std::cout << "Missing instruction: 0x" << std::ios::hex << rb << '\n';
+		throw std::runtime_error{"Missing instruction"};
+	}
+	op.f();
+	cycles += op.cycles;
+	pc += op.offset;
 }
 
 void CPU::INC(WORD& w) {

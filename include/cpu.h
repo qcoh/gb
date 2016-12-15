@@ -33,6 +33,8 @@ class CPU {
 		BYTE n;
 		WORD nn;
 
+		unsigned cycles;
+
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;
 
