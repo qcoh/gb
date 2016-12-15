@@ -20,14 +20,14 @@ class CPU {
 		WORD de;
 		WORD hl;
 
-		BYTE* a;
-		BYTE* f;
-		BYTE* b;
-		BYTE* c;
-		BYTE* d;
-		BYTE* e;
-		BYTE* h;
-		BYTE* l;
+		BYTE& a;
+		BYTE& f;
+		BYTE& b;
+		BYTE& c;
+		BYTE& d;
+		BYTE& e;
+		BYTE& h;
+		BYTE& l;
 
 		// immediate byte/word
 		BYTE n;

@@ -32,11 +32,11 @@ class TestCPU : public CPU {
 		}
 
 		BYTE getB() {
-			return *b;
+			return b;
 		}
 
 		void setA(BYTE a_) {
-			*a = a_;
+			a = a_;
 		}
 };
 
