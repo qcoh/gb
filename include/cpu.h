@@ -51,4 +51,7 @@ class CPU {
 		void LD(T& target, const T& source) {
 			target = source;
 		}
+
+		void JR(const bool&, const BYTE&);
+		void JRn(const bool&, const BYTE&);
 };
