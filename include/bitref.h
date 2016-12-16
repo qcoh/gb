@@ -13,6 +13,11 @@ class BitRef {
 		operator bool () const noexcept {
 			return (((*ptr >> I) & 1) != 0);
 		}
+		// TODO: return type?
+		void operator=(bool rhs) noexcept {
+			T t = rhs;
+			*ptr = (*ptr & (~(1 << I))) | static_cast<T>(rhs << I);
+		}
 	private:
 		T* ptr;
 };

@@ -24,7 +24,7 @@ SCENARIO("Verify bitref", "[bitref]") {
 		}
 	}
 
-	GIVEN("WORD, function bound to bitref") {
+	GIVEN("WORD (1), function bound to bitref") {
 		WORD foo = 0xffff;
 		auto l = [](bool b) -> bool { return b; };
 		auto f = std::bind(l, BitRef<WORD, 10>{foo});
@@ -69,6 +69,32 @@ SCENARIO("Verify bitref", "[bitref]") {
 				REQUIRE(b3 == true);
 				REQUIRE(b5 == true);
 				REQUIRE(b7 == true);
+			}
+		}
+	}
+
+	GIVEN("BYTE (3)") {
+		BYTE foo = 0;
+		BitRef<BYTE, 1> rf{foo};
+
+		WHEN("setting the 2nd bit") {
+			rf = true;
+
+			THEN("foo == 0b0000 0010") {
+				REQUIRE(foo == 0x02);
+			}
+		}
+	}
+	
+	GIVEN("BYTE (4)") {
+		BYTE foo = 0xff;
+		BitRef<BYTE, 7> rf{foo};
+
+		WHEN("unsetting the 7th bit") {
+			rf = false;
+
+			THEN("foo == 0b0111 1111") {
+				REQUIRE(foo == 0x7f);
 			}
 		}
 	}
