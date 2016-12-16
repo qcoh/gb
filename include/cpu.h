@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "types.h"
 #include "instruction.h"
+#include "bitref.h"
 
 class CPU {
 	public:
@@ -28,6 +29,11 @@ class CPU {
 		BYTE& e;
 		BYTE& h;
 		BYTE& l;
+		
+		BitRef<BYTE, 7> zeroFlag;
+		BitRef<BYTE, 6> negFlag;
+		BitRef<BYTE, 5> halfFlag;
+		BitRef<BYTE, 4> carryFlag;
 
 		// immediate byte/word
 		BYTE n;

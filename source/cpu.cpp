@@ -19,9 +19,18 @@ CPU::CPU(MMU&& mmu_) :
 	e{*static_cast<BYTE*>(static_cast<void*>(&de))},
 	h{*(static_cast<BYTE*>(static_cast<void*>(&hl))+1)},
 	l{*static_cast<BYTE*>(static_cast<void*>(&hl))},
+	zeroFlag{f},
+	negFlag{f},
+	halfFlag{f},
+	carryFlag{f},
 	n{0},
 	nn{0}
 {
+	(void)zeroFlag;
+	(void)negFlag;
+	(void)halfFlag;
+	(void)carryFlag;
+
 	instructions = {{
 		{ 0x00, [](){}, "NOP", 4, 1 },
 		{ 0x01, std::bind(&CPU::LD<WORD>, 	this, std::ref(bc), std::cref(nn)), 	"LD BC, nn",	12, 3 },
