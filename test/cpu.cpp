@@ -159,5 +159,19 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getA() == 0xff);
 			}
 		}
+		WHEN("adcing with half-carry and carry") {
+			cpu.setA(0xff);
+			cpu.setB(0x00);
+			auto c = cpu.getCarry();
+			c = true;
+			cpu.call(0x88);
+
+			THEN("a == 0x00, zeroFlag == true, halfFlag == true, carryFlag == true") {
+				REQUIRE(cpu.getA() == 0x00);
+				REQUIRE(cpu.getHalf() == true);
+				REQUIRE(cpu.getZero() == true);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
 	}
 }
