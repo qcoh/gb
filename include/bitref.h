@@ -15,7 +15,6 @@ class BitRef {
 		}
 		// TODO: return type?
 		void operator=(bool rhs) noexcept {
-			T t = rhs;
 			*ptr = (*ptr & (~(1 << I))) | static_cast<T>(rhs << I);
 		}
 	private:
