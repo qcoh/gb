@@ -46,6 +46,10 @@ class TestCPU : public CPU {
 		BYTE getA() {
 			return a;
 		}
+
+		auto getCarry() -> decltype(carryFlag) {
+			return carryFlag;
+		}
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
@@ -110,6 +114,17 @@ SCENARIO("Testing instructions", "[cpu]") {
 			cpu.setA(0x0f);
 			cpu.setB(0xf0);
 			cpu.call(0x80);
+
+			THEN("a == 0xff") {
+				REQUIRE(cpu.getA() == 0xff);
+			}
+		}
+		WHEN("adcing to a") {
+			cpu.setA(0x0e);
+			cpu.setB(0xf0);
+			auto c = cpu.getCarry();
+			c = true;
+			cpu.call(0x88);
 
 			THEN("a == 0xff") {
 				REQUIRE(cpu.getA() == 0xff);

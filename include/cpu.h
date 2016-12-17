@@ -58,4 +58,5 @@ class CPU {
 		void JPn(const bool&, const WORD&);
 
 		void ADD(const BYTE&);
+		void ADC(const BYTE&);
 };
