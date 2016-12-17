@@ -54,6 +54,10 @@ class TestCPU : public CPU {
 		auto getHalf() -> decltype(halfFlag) {
 			return halfFlag;
 		}
+
+		auto getZero() -> decltype(zeroFlag) {
+			return zeroFlag;
+		}
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
@@ -138,9 +142,10 @@ SCENARIO("Testing instructions", "[cpu]") {
 			cpu.setB(0x80);
 			cpu.call(0x80);
 
-			THEN("a == 0x00, carryFlag = true") {
+			THEN("a == 0x00, carryFlag = true, zeroFlag == true") {
 				REQUIRE(cpu.getA() == 0x00);
 				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getZero() == true);
 			}
 		}
 		WHEN("adcing to a") {

@@ -220,7 +220,7 @@ void CPU::ADD(const BYTE& source) {
 	WORD temp = static_cast<WORD>(a) + static_cast<WORD>(source);
 	a = static_cast<BYTE>(temp);
 	carryFlag = ((temp & 0xf00) != 0);
-	zeroFlag = (a != 0);
+	zeroFlag = (a == 0);
 	negFlag = false;
 }
 
@@ -229,6 +229,6 @@ void CPU::ADC(const BYTE& source) {
 	WORD temp = static_cast<WORD>(a) + static_cast<WORD>(source) + carryFlag;
 	a = static_cast<BYTE>(temp);
 	carryFlag = ((temp & 0xf00) != 0);
-	zeroFlag = (a != 0);
+	zeroFlag = (a == 0);
 	negFlag = false;
 }
