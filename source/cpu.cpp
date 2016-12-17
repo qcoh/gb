@@ -133,6 +133,15 @@ CPU::CPU(MMU&& mmu_) :
 		{ 0x7d, std::bind(&CPU::LD<BYTE>,	this, std::ref(a), std::cref(l)),	"LD A, L",	4, 1 },
 		//{ 0x7e, std::bind(&CPU::LD<BYTE>,	this, std::ref(a), std::cref(b)),	"LD A, B",	4, 1 },
 		{ 0x7f, std::bind(&CPU::LD<BYTE>,	this, std::ref(a), std::cref(a)),	"LD A, A",	4, 1 },
+
+		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
+		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
+
+		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
+
+		{ 0xd2, std::bind(&CPU::JPn,		this, carryFlag, std::cref(nn)),	"JP NC, nn",	0, 3 },
+
+		{ 0xda, std::bind(&CPU::JP,		this, carryFlag, std::cref(nn)),	"JP C, nn", 	0, 3 },
 	}};
 }
 
@@ -170,4 +179,20 @@ void CPU::JRn(const bool& cond, const BYTE& offset) {
 		cycles += 4;
 	}
 	cycles += 8;
+}
+
+void CPU::JP(const bool& cond, const WORD& addr) {
+	if (cond) {
+		pc = addr;
+		cycles += 4;
+	}
+	cycles += 12;
+}
+
+void CPU::JPn(const bool& cond, const WORD& addr) {
+	if (!cond) {
+		pc = addr;
+		cycles += 4;
+	}
+	cycles += 12;
 }
