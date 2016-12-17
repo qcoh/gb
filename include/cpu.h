@@ -59,4 +59,5 @@ class CPU {
 
 		void ADD(const BYTE&);
 		void ADC(const BYTE&);
+		void SUB(const BYTE&);
 };

@@ -151,6 +151,15 @@ CPU::CPU(MMU&& mmu_) :
 		{ 0x8d, std::bind(&CPU::ADC,		this, std::cref(l)),			"ADC A, L",	4, 1 },
 		//{ 0x88, std::bind(&CPU::ADC,		this, std::cref(b)),			"ADC A, B",	4, 1 },
 		{ 0x8f, std::bind(&CPU::ADC,		this, std::cref(a)),			"ADC A, A",	4, 1 },
+
+		{ 0x90, std::bind(&CPU::SUB,		this, std::cref(b)),			"SUB A, B",	4, 1 },
+		{ 0x91, std::bind(&CPU::SUB,		this, std::cref(c)),			"SUB A, C",	4, 1 },
+		{ 0x92, std::bind(&CPU::SUB,		this, std::cref(d)),			"SUB A, D",	4, 1 },
+		{ 0x93, std::bind(&CPU::SUB,		this, std::cref(e)),			"SUB A, E",	4, 1 },
+		{ 0x94, std::bind(&CPU::SUB,		this, std::cref(h)),			"SUB A, H",	4, 1 },
+		{ 0x95, std::bind(&CPU::SUB,		this, std::cref(l)),			"SUB A, L",	4, 1 },
+		// (hl)
+		{ 0x97, std::bind(&CPU::SUB,		this, std::cref(a)),			"SUB A, A",	4, 1 },
 		
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
@@ -231,4 +240,13 @@ void CPU::ADC(const BYTE& source) {
 	carryFlag = ((temp & 0xf00) != 0);
 	zeroFlag = (a == 0);
 	negFlag = false;
+}
+
+void CPU::SUB(const BYTE& source) {
+	halfFlag = ((a & 0xf) < (source & 0xf));
+	int temp = a - source;
+	a = static_cast<BYTE>(temp);
+	zeroFlag = (a == 0);
+	carryFlag = (temp < 0);
+	negFlag = true;
 }

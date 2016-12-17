@@ -58,6 +58,10 @@ class TestCPU : public CPU {
 		auto getZero() -> decltype(zeroFlag) {
 			return zeroFlag;
 		}
+
+		auto getNeg() -> decltype(negFlag) {
+			return negFlag;
+		}
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
@@ -171,6 +175,31 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == true);
 				REQUIRE(cpu.getZero() == true);
 				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("subtracting without carry, halfcarry") {
+			cpu.setA(0x0f);
+			cpu.setB(0x0e);
+			cpu.call(0x90);
+
+			THEN("a == 0x01, zeroFlag = false, halfFlag = false, carryFlag == false, negFlag == true") {
+				REQUIRE(cpu.getA() == 0x01);
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == false);
+				REQUIRE(cpu.getCarry() == false);
+				REQUIRE(cpu.getNeg() == true);
+			}
+		}
+		WHEN("subtracting with carry, halfcarry") {
+			cpu.setA(0xee);
+			cpu.setB(0xff);
+			cpu.call(0x90);
+
+			THEN("a == 0xef, carryFlag == true, halfFlag == true, zeroFlag == false") {
+				REQUIRE(cpu.getA() == 0xef);
+				REQUIRE(cpu.getHalf() == true);
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getZero() == false);
 			}
 		}
 	}
