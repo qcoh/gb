@@ -50,6 +50,10 @@ class TestCPU : public CPU {
 		auto getCarry() -> decltype(carryFlag) {
 			return carryFlag;
 		}
+
+		auto getHalf() -> decltype(halfFlag) {
+			return halfFlag;
+		}
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
@@ -117,6 +121,16 @@ SCENARIO("Testing instructions", "[cpu]") {
 
 			THEN("a == 0xff") {
 				REQUIRE(cpu.getA() == 0xff);
+			}
+		}
+		WHEN("adding with half-carry") {
+			cpu.setA(0x0f);
+			cpu.setB(0x0f);
+			cpu.call(0x80);
+
+			THEN("a == 0x1e, halfFlag == true") {
+				REQUIRE(cpu.getA() == 0x1e);
+				REQUIRE(cpu.getHalf() == true);
 			}
 		}
 		WHEN("adcing to a") {
