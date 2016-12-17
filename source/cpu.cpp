@@ -134,6 +134,15 @@ CPU::CPU(MMU&& mmu_) :
 		//{ 0x7e, std::bind(&CPU::LD<BYTE>,	this, std::ref(a), std::cref(b)),	"LD A, B",	4, 1 },
 		{ 0x7f, std::bind(&CPU::LD<BYTE>,	this, std::ref(a), std::cref(a)),	"LD A, A",	4, 1 },
 
+		{ 0x80, std::bind(&CPU::ADD,		this, std::cref(b)),			"ADD A, B",	4, 1 },
+		{ 0x81, std::bind(&CPU::ADD,		this, std::cref(c)),			"ADD A, C",	4, 1 },
+		{ 0x82, std::bind(&CPU::ADD,		this, std::cref(d)),			"ADD A, D",	4, 1 },
+		{ 0x83, std::bind(&CPU::ADD,		this, std::cref(e)),			"ADD A, E",	4, 1 },
+		{ 0x84, std::bind(&CPU::ADD,		this, std::cref(h)),			"ADD A, H",	4, 1 },
+		{ 0x85, std::bind(&CPU::ADD,		this, std::cref(l)),			"ADD A, L",	4, 1 },
+		// (hl)
+		{ 0x87, std::bind(&CPU::ADD,		this, std::cref(a)),			"ADD A, A",	4, 1 },
+		
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
 
@@ -195,4 +204,13 @@ void CPU::JPn(const bool& cond, const WORD& addr) {
 		cycles += 4;
 	}
 	cycles += 12;
+}
+
+void CPU::ADD(const BYTE& source) {
+	halfFlag = ((((a & 0xf) + (source & 0xf)) & 0xf0) != 0);
+	WORD temp = static_cast<WORD>(a) + static_cast<WORD>(source);
+	a = static_cast<BYTE>(temp);
+	carryFlag = ((temp & 0xf00) != 0);
+	zeroFlag = (a != 0);
+	negFlag = false;
 }

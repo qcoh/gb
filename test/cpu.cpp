@@ -31,12 +31,20 @@ class TestCPU : public CPU {
 			n = n_;
 		}
 
+		void setB(BYTE b_) {
+			b = b_;
+		}
+
 		BYTE getB() {
 			return b;
 		}
 
 		void setA(BYTE a_) {
 			a = a_;
+		}
+
+		BYTE getA() {
+			return a;
 		}
 };
 
@@ -96,6 +104,15 @@ SCENARIO("Testing instructions", "[cpu]") {
 
 			THEN("b == 0xbb") {
 				REQUIRE(cpu.getB() == 0xbb);
+			}
+		}
+		WHEN("adding to a") {
+			cpu.setA(0x0f);
+			cpu.setB(0xf0);
+			cpu.call(0x80);
+
+			THEN("a == 0xff") {
+				REQUIRE(cpu.getA() == 0xff);
 			}
 		}
 	}
