@@ -133,6 +133,16 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == true);
 			}
 		}
+		WHEN("adding with carry") {
+			cpu.setA(0x80);
+			cpu.setB(0x80);
+			cpu.call(0x80);
+
+			THEN("a == 0x00, carryFlag = true") {
+				REQUIRE(cpu.getA() == 0x00);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
 		WHEN("adcing to a") {
 			cpu.setA(0x0e);
 			cpu.setB(0xf0);
