@@ -61,4 +61,5 @@ class CPU {
 		void ADC(const BYTE&);
 		void SUB(const BYTE&);
 		void SBC(const BYTE&);
+		void AND(const BYTE&);
 };

@@ -169,6 +169,15 @@ CPU::CPU(MMU&& mmu_) :
 		{ 0x9d, std::bind(&CPU::SBC,		this, std::cref(l)),			"SBC A, L",	4, 1 },
 		// (hl)
 		{ 0x9f, std::bind(&CPU::SBC,		this, std::cref(a)),			"SBC A, A",	4, 1 },
+
+		{ 0xa0, std::bind(&CPU::AND,		this, std::cref(b)),			"ADD A, B",	4, 1 },
+		{ 0xa1, std::bind(&CPU::AND,		this, std::cref(c)),			"ADD A, C",	4, 1 },
+		{ 0xa2, std::bind(&CPU::AND,		this, std::cref(d)),			"ADD A, D",	4, 1 },
+		{ 0xa3, std::bind(&CPU::AND,		this, std::cref(e)),			"ADD A, E",	4, 1 },
+		{ 0xa4, std::bind(&CPU::AND,		this, std::cref(h)),			"ADD A, H",	4, 1 },
+		{ 0xa5, std::bind(&CPU::AND,		this, std::cref(l)),			"ADD A, L",	4, 1 },
+		// (hl)
+		{ 0xa7, std::bind(&CPU::AND,		this, std::cref(a)),			"ADD A, A",	4, 1 },
 		
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
@@ -267,4 +276,12 @@ void CPU::SBC(const BYTE& source) {
 	zeroFlag = (a == 0);
 	carryFlag = (temp < 0);
 	negFlag = true;
+}
+
+void CPU::AND(const BYTE& source) {
+	a &= source;
+	zeroFlag = (a == 0);
+	halfFlag = true;
+	negFlag = false;
+	carryFlag = false;
 }
