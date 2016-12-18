@@ -256,5 +256,25 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getZero() == true);
 			}
 		}
+		WHEN("oring (no zero)") {
+			cpu.setA(0xb0);
+			cpu.setB(0x0a);
+			cpu.call(0xb0);
+
+			THEN("a == 0xba, zeroFlag == false") {
+				REQUIRE(cpu.getA() == 0xba);
+				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("oring (zero)") {
+			cpu.setA(0x00);
+			cpu.setB(0x00);
+			cpu.call(0xb0);
+
+			THEN("a == 0x00, zeroFlag == true") {
+				REQUIRE(cpu.getA() == 0x00);
+				REQUIRE(cpu.getZero() == true);
+			}
+		}
 	}
 }
