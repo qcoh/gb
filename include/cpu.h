@@ -62,4 +62,5 @@ class CPU {
 		void SUB(const BYTE&);
 		void SBC(const BYTE&);
 		void AND(const BYTE&);
+		void XOR(const BYTE&);
 };
