@@ -64,4 +64,5 @@ class CPU {
 		void AND(const BYTE&);
 		void XOR(const BYTE&);
 		void OR(const BYTE&);
+		void CP(const BYTE&);
 };

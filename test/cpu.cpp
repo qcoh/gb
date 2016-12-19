@@ -276,5 +276,38 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getZero() == true);
 			}
 		}
+		WHEN("cping (less)") {
+			cpu.setA(0x00);
+			cpu.setB(0x01);
+			cpu.call(0xb8);
+
+			THEN("zeroFlag == false, halfFlag == true, carryFlag == true") {
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == true);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("cping (more)") {
+			cpu.setA(0xff);
+			cpu.setB(0x0f);
+			cpu.call(0xb8);
+
+			THEN("zeroFlag == false, halfFlag == false, carryFlag == false") {
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == false);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("cping (equal)") {
+			cpu.setA(0x55);
+			cpu.setB(0x55);
+			cpu.call(0xb8);
+
+			THEN("zeroFlag == true, halfFlag == false, carryFlag == false") {
+				REQUIRE(cpu.getZero() == true);
+				REQUIRE(cpu.getHalf() == false);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
 	}
 }

@@ -196,6 +196,15 @@ CPU::CPU(MMU&& mmu_) :
 		{ 0xb5, std::bind(&CPU::OR,		this, std::cref(l)),			"OR A, L",	4, 1 },
 		// (hl)
 		{ 0xb7, std::bind(&CPU::OR,		this, std::cref(a)),			"OR A, A",	4, 1 },
+
+		{ 0xb8, std::bind(&CPU::CP,		this, std::cref(b)),			"CP A, B",	4, 1 },
+		{ 0xb9, std::bind(&CPU::CP,		this, std::cref(c)),			"CP A, C",	4, 1 },
+		{ 0xba, std::bind(&CPU::CP,		this, std::cref(d)),			"CP A, D",	4, 1 },
+		{ 0xbb, std::bind(&CPU::CP,		this, std::cref(e)),			"CP A, E",	4, 1 },
+		{ 0xbc, std::bind(&CPU::CP,		this, std::cref(h)),			"CP A, H",	4, 1 },
+		{ 0xbd, std::bind(&CPU::CP,		this, std::cref(l)),			"CP A, L",	4, 1 },
+		// (hl)
+		{ 0xbf, std::bind(&CPU::CP,		this, std::cref(a)),			"CP A, A",	4, 1 },
 		
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
@@ -318,4 +327,12 @@ void CPU::OR(const BYTE& source) {
 	halfFlag = false;
 	negFlag = false;
 	carryFlag = false;
+}
+
+void CPU::CP(const BYTE& source) {
+	int temp = a - source;
+	halfFlag = ((a & 0xf) < (source & 0xf));
+	carryFlag = (temp < 0);
+	negFlag = true;
+	zeroFlag = (temp == 0);
 }
