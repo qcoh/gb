@@ -6,11 +6,12 @@
 
 SCENARIO("reading a WORD (from bios) should have correct endianness", "[mmu]") {
 	GIVEN("a MMU containing an emptry RomOnly") {
-		auto ptr = std::make_unique<RomOnly>(std::vector<BYTE>{});
+		std::vector<BYTE> data = { 0xfe, 0xff };
+		auto ptr = std::make_unique<RomOnly>(std::move(data));
 		MMU mmu{std::move(ptr)};
 
 		WHEN("reading a WORD") {
-			WORD w = mmu.readWord(1);
+			WORD w = mmu.readWord(0);
 
 			THEN("WORD has correct endianess") {
 				REQUIRE(w == 0xfffe);
