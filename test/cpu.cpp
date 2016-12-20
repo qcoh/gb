@@ -47,6 +47,10 @@ class TestCPU : public CPU {
 			return a;
 		}
 
+		void setHL(WORD hl_) {
+			hl = hl_;
+		}
+
 		auto getCarry() -> decltype(carryFlag) {
 			return carryFlag;
 		}
@@ -75,6 +79,24 @@ SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 			THEN("b == 0xff") {
 				auto b = cpu.getB();
 				REQUIRE(b == 0xff);
+			}
+		}
+	}
+}
+
+
+SCENARIO("Testing MemRef", "[cpu]") {
+	GIVEN("CPU-derivative") {
+		std::vector<BYTE> data = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+		auto ptr = std::make_unique<RomOnly>(std::move(data));
+		TestCPU cpu{MMU{std::move(ptr)}};
+
+		WHEN("setting hl = 1, reading (hl) to a") {
+			cpu.setHL(1);
+			cpu.call(0x7e);
+
+			THEN("a == 0xbb") {
+				REQUIRE(cpu.getA() == 0xbb);
 			}
 		}
 	}
