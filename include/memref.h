@@ -10,8 +10,8 @@ class MemRef {
 		MemRef(const MemRef&) = default;
 		MemRef& operator=(const MemRef&) = delete;
 
-		operator BYTE ();
-		operator WORD ();
+		operator BYTE () const;
+		operator WORD () const;
 
 		void operator=(BYTE);
 		void operator=(WORD);

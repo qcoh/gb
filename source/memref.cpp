@@ -3,11 +3,11 @@
 MemRef::MemRef(const WORD& addr_, MMU& mmu_) : addr{addr_}, mmu{mmu_} {
 }
 
-MemRef::operator BYTE () {
+MemRef::operator BYTE () const {
 	return mmu.readByte(addr);
 }
 
-MemRef::operator WORD () {
+MemRef::operator WORD () const {
 	return mmu.readWord(addr);
 }
 
