@@ -33,33 +33,48 @@ CPU::CPU(MMU&& mmu_) :
 		{ 0x01, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(bc), std::cref(nn)), 	"LD BC, nn",	12, 3 },
 		{ 0x02, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{bc, mmu}, std::cref(a)),	"LD (BC), A",	8, 1 },
 		{ 0x03, std::bind(&CPU::INC,			this, std::ref(bc)),			"INC BC",	8, 1 },
+		{ 0x04, std::bind(&CPU::INCb,			this, std::ref(b)),			"INC B",	4, 1 },
+		{ 0x05, std::bind(&CPU::DECb,			this, std::ref(b)),			"DEC B",	4, 1 },
 		{ 0x06, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(b), std::cref(n)), 	"LD B, n",	8, 2 },
 		{ 0x08, std::bind(&CPU::LD<MemRef, WORD>,	this, MemRef{nn, mmu}, std::cref(sp)),	"LD (nn), SP",	20, 3 },
 		{ 0x0a, std::bind(&CPU::LD<BYTE, MemRef>,	this, std::ref(a), MemRef{bc, mmu}),	"LD A, (BC)",	8, 1 },
 		{ 0x0b, std::bind(&CPU::DEC,			this, std::ref(bc)), 			"DEC BC", 	8, 1 },
+		{ 0x0c, std::bind(&CPU::INCb,			this, std::ref(c)),			"INC C",	4, 1 },
+		{ 0x0d, std::bind(&CPU::DECb,			this, std::ref(c)),			"DEC C",	4, 1 },
 		{ 0x0e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(c), std::cref(n)), 	"LD C, n", 	8, 2 },
 		{ 0x11, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(de), std::cref(nn)), 	"LD DE, nn", 	12, 3 },
 		{ 0x12, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{de, mmu}, std::cref(a)),	"LD (DE), A",	8, 1 },
 		{ 0x13, std::bind(&CPU::INC, 			this, std::ref(de)), 			"INC DE", 	8, 1 },
+		{ 0x14, std::bind(&CPU::INCb, 			this, std::ref(d)),			"INC D",	4, 1 },
+		{ 0x15, std::bind(&CPU::DECb, 			this, std::ref(d)),			"DEC D",	4, 1 },
 		{ 0x16, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(d), std::cref(n)), 	"LD D, n", 	8, 2 },
 		{ 0x18, std::bind(&CPU::JR,			this, true, std::cref(n)),		"JR n",		0, 2 },
 		{ 0x1a, std::bind(&CPU::LD<BYTE, MemRef>,	this, std::ref(a), MemRef{de, mmu}),	"LD A, (DE)",	8, 1 },
 		{ 0x1b, std::bind(&CPU::DEC, 			this, std::ref(de)), 			"DEC DE", 	8, 1 },
+		{ 0x1c, std::bind(&CPU::INCb,			this, std::ref(e)),			"INC E",	4, 1 },
+		{ 0x1d, std::bind(&CPU::DECb,			this, std::ref(e)),			"DEC E",	4, 1 },
 		{ 0x1e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(e), std::cref(n)), 	"LD E, n", 	8, 2 },
 		{ 0x20, std::bind(&CPU::JRn,			this, zeroFlag, std::cref(n)),		"JR NZ, n",	0, 2 },
 		{ 0x21, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(hl), std::cref(nn)), 	"LD HL, nn", 	12, 3 },
 		{ 0x23, std::bind(&CPU::INC, 			this, std::ref(hl)), 			"INC HL", 	8, 1 },
+		{ 0x24, std::bind(&CPU::INCb, 			this, std::ref(h)),			"INC H",	4, 1 },
+		{ 0x25, std::bind(&CPU::DECb, 			this, std::ref(h)),			"DEC H",	4, 1 },
 		{ 0x26, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(h), std::cref(n)), 	"LD H, n", 	8, 2 },
 		{ 0x28, std::bind(&CPU::JR,			this, zeroFlag, std::cref(n)),		"JR Z, n",	0, 2 },
 		{ 0x2b, std::bind(&CPU::DEC, 			this, std::ref(hl)), 			"DEC HL", 	8, 1 },
+		{ 0x2c, std::bind(&CPU::INCb,			this, std::ref(l)),			"INC L",	4, 1 },
+		{ 0x2d, std::bind(&CPU::DECb,			this, std::ref(l)),			"DEC L",	4, 1 },
 		{ 0x2e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(l), std::cref(n)), 	"LD L, n", 	8, 2 },
 		{ 0x30, std::bind(&CPU::JRn,			this, carryFlag, std::cref(n)),		"JR NC, n",	0, 2 },
 		{ 0x31, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(sp), std::cref(nn)), 	"LD SP, nn", 	12, 3 },
 		{ 0x33, std::bind(&CPU::INC, 			this, std::ref(sp)), 			"INC SP", 	8, 1 },
+		//{ 0x34, std::bind(&CPU::INCb, 			this, MemRef{hl, mmu}),			"INC (HL)",	12, 1 },
+		//{ 0x35, std::bind(&CPU::DECb, 			this, MemRef{hl, mmu}),			"DEC (HL)",	12, 1 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 2 },
 		{ 0x3b, std::bind(&CPU::DEC,			this, std::ref(sp)), 			"DEC SP", 	8, 1 },
+		{ 0x3c, std::bind(&CPU::INCb,			this, std::ref(a)),			"INC A",	4, 1 },
+		{ 0x3d, std::bind(&CPU::DECb,			this, std::ref(a)),			"DEC A",	4, 1 },
 		{ 0x3e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(a), std::cref(n)), 	"LD A, n", 	8, 2 },
-
 		{ 0x40, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(b)),	"LD B, B",	4, 1 },
 		{ 0x41, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(c)),	"LD B, C",	4, 1 },
 		{ 0x42, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(d)),	"LD B, D",	4, 1 },
@@ -352,4 +367,18 @@ void CPU::CP(const BYTE& source) {
 	carryFlag = (temp < 0);
 	negFlag = true;
 	zeroFlag = (temp == 0);
+}
+
+void CPU::INCb(BYTE& target) {
+	halfFlag = ((((target & 0xf) + 1) & 0xf0) != 0);
+	target++;
+	zeroFlag = (target == 0);
+	negFlag = false;
+}
+
+void CPU::DECb(BYTE& target) {
+	halfFlag = ((target & 0xf) == 0);
+	target--;
+	zeroFlag = (target == 0);
+	negFlag = true;
 }

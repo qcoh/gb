@@ -331,5 +331,35 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getCarry() == false);
 			}
 		}
+		WHEN("inc a (overflow)") {
+			cpu.setA(0xff);
+			cpu.call(0x3c);
+
+			THEN("a == 0x00, zeroFlag == true, halfFlag == true") {
+				REQUIRE(cpu.getA() == 0x00);
+				REQUIRE(cpu.getZero() == true);
+				REQUIRE(cpu.getHalf() == true);
+			}
+		}
+		WHEN("inc a (halfCarry, no overflow)") {
+			cpu.setA(0x0f);
+			cpu.call(0x3c);
+
+			THEN("a == 0x10, zeroFlag == false, halfFlag == true") {
+				REQUIRE(cpu.getA() == 0x10);
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == true);
+			}
+		}
+		WHEN("inc a (no overflow)") {
+			cpu.setA(0x00);
+			cpu.call(0x3c);
+
+			THEN("a == 0x01, zeroFlag == false, halfFlag == false") {
+				REQUIRE(cpu.getA() == 0x01);
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == false);
+			}
+		}
 	}
 }
