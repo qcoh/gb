@@ -1,11 +1,11 @@
 #pragma once
 
 #include "types.h"
-#include "mmu.h"
+#include "immu.h"
 
 class MemRef {
 	public:
-		MemRef(const WORD&, MMU&);
+		MemRef(const WORD&, IMMU&);
 
 		MemRef(const MemRef&) = default;
 		MemRef& operator=(const MemRef&) = delete;
@@ -17,5 +17,5 @@ class MemRef {
 		void operator=(WORD);
 	private:
 		const WORD& addr;
-		MMU& mmu;
+		IMMU& mmu;
 };

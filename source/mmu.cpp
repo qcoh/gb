@@ -37,17 +37,7 @@ BYTE MMU::readByte(WORD addr) {
 	return mapper->readByte(addr);
 }
 
-WORD MMU::readWord(WORD addr) {
-	return static_cast<WORD>(readByte(addr) | readByte(static_cast<WORD>(addr+1)) << 8);
-}
-
 void MMU::writeByte(WORD addr, BYTE v) {
-	// TODO
-	(void)addr;
-	(void)v;
-}
-
-void MMU::writeWord(WORD addr, WORD v) {
 	// TODO
 	(void)addr;
 	(void)v;

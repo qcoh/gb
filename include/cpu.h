@@ -1,17 +1,17 @@
 #pragma once
 
-#include "mmu.h"
+#include "immu.h"
 #include "types.h"
 #include "instruction.h"
 #include "bitref.h"
 
 class CPU {
 	public:
-		CPU(MMU&&);
+		CPU(IMMU&);
 
 		void step();
 	protected:
-		MMU mmu;
+		IMMU& mmu;
 
 		WORD pc;
 		WORD sp;

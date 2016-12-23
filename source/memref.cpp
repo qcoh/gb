@@ -1,6 +1,6 @@
 #include "memref.h"
 
-MemRef::MemRef(const WORD& addr_, MMU& mmu_) : addr{addr_}, mmu{mmu_} {
+MemRef::MemRef(const WORD& addr_, IMMU& mmu_) : addr{addr_}, mmu{mmu_} {
 }
 
 MemRef::operator BYTE () const {

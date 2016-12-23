@@ -5,8 +5,8 @@
 #include "cpu.h"
 #include "memref.h"
 
-CPU::CPU(MMU&& mmu_) :
-	mmu{std::move(mmu_)},
+CPU::CPU(IMMU& mmu_) :
+	mmu{mmu_},
 	pc{0},
 	sp{0},
 	af{0},

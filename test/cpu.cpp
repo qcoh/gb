@@ -1,10 +1,11 @@
 #include "catch.hpp"
 #include "cpu.h"
 #include "romonly.h"
+#include "mmu.h"
 
 class TestCPU : public CPU {
 	public:
-		TestCPU(MMU&& mmu_) : CPU(std::move(mmu_)) {
+		TestCPU(IMMU& mmu_) : CPU{mmu_} {
 		}
 
 		void call(BYTE op) {
@@ -51,6 +52,10 @@ class TestCPU : public CPU {
 			hl = hl_;
 		}
 
+		void setSP(WORD sp_) {
+			sp = sp_;
+		}
+
 		auto getCarry() -> decltype(carryFlag) {
 			return carryFlag;
 		}
@@ -68,10 +73,26 @@ class TestCPU : public CPU {
 		}
 };
 
+class TestMMU : public IMMU {
+	public:
+		TestMMU() : data{} {}
+		TestMMU(std::array<BYTE, 1024>&& data_) : data{std::move(data_)} {}
+
+		BYTE readByte(WORD addr) override {
+			return data[addr];
+		}
+
+		void writeByte(WORD addr, BYTE v) override {
+			data[addr] = v;
+		}
+
+		std::array<BYTE, 1024> data;
+};
+
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 	GIVEN("CPU-derivative with BC and B accessors") {
-		auto ptr = std::make_unique<RomOnly>(std::vector<BYTE>{});
-		TestCPU cpu{MMU{std::move(ptr)}};
+		TestMMU mmu{};
+		TestCPU cpu{mmu};
 
 		WHEN("setting bc to 0xff00") {
 			cpu.setBC(0xff00);
@@ -87,9 +108,9 @@ SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 
 SCENARIO("Testing MemRef", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::vector<BYTE> data = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-		auto ptr = std::make_unique<RomOnly>(std::move(data));
-		TestCPU cpu{MMU{std::move(ptr)}};
+		std::array<BYTE, 1024> data = {{ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }};
+		TestMMU mmu{std::move(data)};
+		TestCPU cpu{mmu};
 
 		WHEN("setting hl = 1, reading (hl) to a") {
 			cpu.setHL(1);
@@ -99,13 +120,28 @@ SCENARIO("Testing MemRef", "[cpu]") {
 				REQUIRE(cpu.getA() == 0xbb);
 			}
 		}
+		WHEN("lding sp to (nn), lding (nn) to a, (nn+1) to b") {
+			cpu.setNN(0x12);
+			cpu.setSP(0xffee);
+			cpu.call(0x08);
+
+			cpu.setHL(0x12);
+			cpu.call(0x7e);
+			cpu.setHL(0x13);
+			cpu.call(0x46);
+
+			THEN("a == 0xee, b == 0xff") {
+				REQUIRE(cpu.getA() == 0xee);
+				REQUIRE(cpu.getB() == 0xff);
+			}
+		}
 	}
 }
 
 SCENARIO("Testing instructions", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		auto ptr = std::make_unique<RomOnly>(std::vector<BYTE>{});
-		TestCPU cpu{MMU{std::move(ptr)}};
+		TestMMU mmu{};
+		TestCPU cpu{mmu};
 
 		WHEN("incrementing bc") {
 			cpu.call(0x03); // INC BC
