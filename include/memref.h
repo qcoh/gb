@@ -10,6 +10,7 @@ class MemRef : public Ref<BYTE>, public Ref<WORD> {
 
 		MemRef(const MemRef&) = default;
 		MemRef& operator=(const MemRef&) = delete;
+		virtual ~MemRef() = default;
 
 		virtual operator BYTE () const override;
 		virtual operator WORD () const override;
