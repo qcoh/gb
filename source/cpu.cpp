@@ -251,13 +251,21 @@ CPU::CPU(IMMU& mmu_) :
 
 	extended = {{
 		{ 0x00, std::bind(&CPU::RLC<BYTE>, this, std::ref(b)),		"RLC B", 8, 0 },
-		{ 0x01, std::bind(&CPU::RLC<BYTE>, this, std::ref(c)),		"RLC B", 8, 0 },
-		{ 0x02, std::bind(&CPU::RLC<BYTE>, this, std::ref(d)),		"RLC B", 8, 0 },
-		{ 0x03, std::bind(&CPU::RLC<BYTE>, this, std::ref(e)),		"RLC B", 8, 0 },
-		{ 0x04, std::bind(&CPU::RLC<BYTE>, this, std::ref(h)),		"RLC B", 8, 0 },
-		{ 0x05, std::bind(&CPU::RLC<BYTE>, this, std::ref(l)),		"RLC B", 8, 0 },
-		{ 0x06, std::bind(&CPU::RLC<MemRef>, this, MemRef{hl, mmu}),	"RLC B", 8, 0 },
-		{ 0x07, std::bind(&CPU::RLC<BYTE>, this, std::ref(a)),		"RLC B", 8, 0 },
+		{ 0x01, std::bind(&CPU::RLC<BYTE>, this, std::ref(c)),		"RLC C", 8, 0 },
+		{ 0x02, std::bind(&CPU::RLC<BYTE>, this, std::ref(d)),		"RLC D", 8, 0 },
+		{ 0x03, std::bind(&CPU::RLC<BYTE>, this, std::ref(e)),		"RLC E", 8, 0 },
+		{ 0x04, std::bind(&CPU::RLC<BYTE>, this, std::ref(h)),		"RLC H", 8, 0 },
+		{ 0x05, std::bind(&CPU::RLC<BYTE>, this, std::ref(l)),		"RLC L", 8, 0 },
+		{ 0x06, std::bind(&CPU::RLC<MemRef>, this, MemRef{hl, mmu}),	"RLC (HL)", 8, 0 },
+		{ 0x07, std::bind(&CPU::RLC<BYTE>, this, std::ref(a)),		"RLC A", 8, 0 },
+		{ 0x08, std::bind(&CPU::RRC<BYTE>, this, std::ref(b)),		"RRC B", 8, 0 },
+		{ 0x09, std::bind(&CPU::RRC<BYTE>, this, std::ref(c)),		"RRC C", 8, 0 },
+		{ 0x0a, std::bind(&CPU::RRC<BYTE>, this, std::ref(d)),		"RRC D", 8, 0 },
+		{ 0x0b, std::bind(&CPU::RRC<BYTE>, this, std::ref(e)),		"RRC E", 8, 0 },
+		{ 0x0c, std::bind(&CPU::RRC<BYTE>, this, std::ref(h)),		"RRC H", 8, 0 },
+		{ 0x0d, std::bind(&CPU::RRC<BYTE>, this, std::ref(l)),		"RRC L", 8, 0 },
+		{ 0x0e, std::bind(&CPU::RRC<MemRef>, this, MemRef{hl, mmu}),		"RRC (HL)", 8, 0 },
+		{ 0x0f, std::bind(&CPU::RRC<BYTE>, this, std::ref(a)),		"RRC A", 8, 0 },
 
 	}};
 }

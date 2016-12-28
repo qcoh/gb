@@ -415,5 +415,25 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 				REQUIRE(cpu.getCarry() == true);
 			}
 		}
+		WHEN("rrcing a") {
+			cpu.setN(0x0f);
+			cpu.setA(0b10011001);
+			cpu.call(0xcb);
+
+			THEN("a == 0b11001100, carryFlag == true") {
+				REQUIRE(cpu.getA() == 0b11001100);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("rrcing a (without carry)") {
+			cpu.setN(0x0f);
+			cpu.setA(0b11110000);
+			cpu.call(0xcb);
+
+			THEN("a == 0b01111000, carryFlag == false") {
+				REQUIRE(cpu.getA() == 0b01111000);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
 	}
 }
