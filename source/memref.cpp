@@ -7,10 +7,6 @@ MemRef::operator BYTE () const {
 	return mmu.readByte(addr);
 }
 
-MemRef::operator WORD () const {
-	return mmu.readWord(addr);
-}
-
 void MemRef::operator=(BYTE rhs) {
 	mmu.writeByte(addr, rhs);
 }

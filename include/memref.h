@@ -1,10 +1,9 @@
 #pragma once
 
-#include "ref.h"
 #include "types.h"
 #include "immu.h"
 
-class MemRef : public Ref<BYTE>, public Ref<WORD> {
+class MemRef {
 	public:
 		MemRef(const WORD&, IMMU&);
 
@@ -12,11 +11,10 @@ class MemRef : public Ref<BYTE>, public Ref<WORD> {
 		MemRef& operator=(const MemRef&) = delete;
 		virtual ~MemRef() = default;
 
-		virtual operator BYTE () const override;
-		virtual operator WORD () const override;
+		operator BYTE () const;
 
-		virtual void operator=(BYTE) override;
-		virtual void operator=(WORD) override;
+		void operator=(BYTE);
+		void operator=(WORD);
 	private:
 		const WORD& addr;
 		IMMU& mmu;
