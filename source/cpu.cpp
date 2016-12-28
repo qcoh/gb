@@ -228,6 +228,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 2 },
 
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
+		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
 
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 2 },
 
@@ -246,6 +247,10 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 2 },
 
 		{ 0xfe, std::bind(&CPU::CP,		this, std::cref(n)),			"CP A, n",	8, 2 },
+	}};
+
+	extended = {{
+		//{ 0x00, std::bind(&CPU::RLC,	this, byteref),	"RLC B", 8, 0 },
 	}};
 }
 
@@ -381,4 +386,14 @@ void CPU::DECb(BYTE& target) {
 	target--;
 	zeroFlag = (target == 0);
 	negFlag = true;
+}
+
+void CPU::CB() {
+	auto& op = extended[n];
+	if (op.opcode == n) {
+		std::cout << "Missing extended instruction: 0x" << std::ios::hex << n << '\n';
+		throw std::runtime_error{"Missing instruction"};
+	}
+	op.f();
+	cycles += op.cycles;
 }
