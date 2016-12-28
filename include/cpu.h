@@ -69,4 +69,13 @@ class CPU {
 		void CP(const BYTE&);
 
 		void CB();
+
+		template <typename T>
+		void RLC(T& target) {
+			carryFlag = ((target >> 7) != 0);
+			target = static_cast<BYTE>(target << 1);
+			zeroFlag = (target == 0);
+			halfFlag = false;
+			negFlag = false;
+		}
 };

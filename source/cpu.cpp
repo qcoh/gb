@@ -250,14 +250,22 @@ CPU::CPU(IMMU& mmu_) :
 	}};
 
 	extended = {{
-		//{ 0x00, std::bind(&CPU::RLC,	this, byteref),	"RLC B", 8, 0 },
+		{ 0x00, std::bind(&CPU::RLC<BYTE>, this, std::ref(b)),		"RLC B", 8, 0 },
+		{ 0x01, std::bind(&CPU::RLC<BYTE>, this, std::ref(c)),		"RLC B", 8, 0 },
+		{ 0x02, std::bind(&CPU::RLC<BYTE>, this, std::ref(d)),		"RLC B", 8, 0 },
+		{ 0x03, std::bind(&CPU::RLC<BYTE>, this, std::ref(e)),		"RLC B", 8, 0 },
+		{ 0x04, std::bind(&CPU::RLC<BYTE>, this, std::ref(h)),		"RLC B", 8, 0 },
+		{ 0x05, std::bind(&CPU::RLC<BYTE>, this, std::ref(l)),		"RLC B", 8, 0 },
+		{ 0x06, std::bind(&CPU::RLC<MemRef>, this, MemRef{hl, mmu}),	"RLC B", 8, 0 },
+		{ 0x07, std::bind(&CPU::RLC<BYTE>, this, std::ref(a)),		"RLC B", 8, 0 },
+
 	}};
 }
 
 void CPU::step() {
 	auto rb = mmu.readByte(pc);
 	auto& op = instructions[rb];
-	if (op.opcode == rb) {
+	if (op.opcode != rb) {
 		std::cout << "Missing instruction: 0x" << std::ios::hex << rb << '\n';
 		throw std::runtime_error{"Missing instruction"};
 	}
@@ -390,7 +398,7 @@ void CPU::DECb(BYTE& target) {
 
 void CPU::CB() {
 	auto& op = extended[n];
-	if (op.opcode == n) {
+	if (op.opcode != n) {
 		std::cout << "Missing extended instruction: 0x" << std::ios::hex << n << '\n';
 		throw std::runtime_error{"Missing instruction"};
 	}
