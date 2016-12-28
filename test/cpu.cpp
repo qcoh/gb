@@ -410,8 +410,8 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 			cpu.setA(0b11111111);
 			cpu.call(0xcb);
 
-			THEN("a == 0b1111_1110, carryFlag == true") {
-				REQUIRE(cpu.getA() == 0b11111110);
+			THEN("a == 0b11111111, carryFlag == true") {
+				REQUIRE(cpu.getA() == 0b11111111);
 				REQUIRE(cpu.getCarry() == true);
 			}
 		}

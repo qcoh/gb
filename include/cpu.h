@@ -73,7 +73,7 @@ class CPU {
 		template <typename T>
 		void RLC(T& target) {
 			carryFlag = ((target >> 7) != 0);
-			target = static_cast<BYTE>(target << 1);
+			target = static_cast<BYTE>(static_cast<BYTE>(target << 1) | carryFlag);
 			zeroFlag = (target == 0);
 			halfFlag = false;
 			negFlag = false;
