@@ -125,4 +125,13 @@ class CPU {
 			halfFlag = false;
 			negFlag = false;
 		}
+
+		template <typename T>
+		void SWAP(T& target) {
+			target = static_cast<BYTE>((target >> 4) | (target << 4));
+			zeroFlag = (target == 0);
+			carryFlag = false;
+			halfFlag = false;
+			negFlag = false;
+		}
 };

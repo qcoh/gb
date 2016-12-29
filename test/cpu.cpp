@@ -521,5 +521,25 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 				REQUIRE(cpu.getZero() == true);
 			}
 		}
+		WHEN("swapping a (1)") {
+			cpu.setN(0x37);
+			cpu.setA(0b11110000);
+			cpu.call(0xcb);
+
+			THEN("a == 0b00001111, zeroFlag == false") {
+				REQUIRE(cpu.getA() == 0b00001111);
+				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("swapping a (2)") {
+			cpu.setN(0x37);
+			cpu.setA(0);
+			cpu.call(0xcb);
+
+			THEN("a == 0, zeroFlag == true") {
+				REQUIRE(cpu.getA() == 0);
+				REQUIRE(cpu.getZero() == true);
+			}
+		}
 	}
 }
