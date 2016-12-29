@@ -108,7 +108,7 @@ SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 
 SCENARIO("Testing MemRef", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::array<BYTE, 1024> data = {{ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }};
+		std::array<BYTE, 1024> data = {{ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0b10101010, 0b01010101 }};
 		TestMMU mmu{std::move(data)};
 		TestCPU cpu{mmu};
 
@@ -133,6 +133,42 @@ SCENARIO("Testing MemRef", "[cpu]") {
 			THEN("a == 0xee, b == 0xff") {
 				REQUIRE(cpu.getA() == 0xee);
 				REQUIRE(cpu.getB() == 0xff);
+			}
+		}
+		WHEN("bitting (HL) (1)") {
+			cpu.setHL(1);
+			cpu.setN(0x46);
+			cpu.call(0xcb);
+
+			THEN("zeroFlag == false") {
+				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("bitting (HL) (2)") {
+			cpu.setHL(0);
+			cpu.setN(0x46);
+			cpu.call(0xcb);
+
+			THEN("zeroFlag == true") {
+				REQUIRE(cpu.getZero() == true);
+			}
+		}
+		WHEN("bitting (HL) (3)") {
+			cpu.setHL(6);
+			cpu.setN(0x7e);
+			cpu.call(0xcb);
+
+			THEN("zeroFlag == false") {
+				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("bitting (HL) (4)") {
+			cpu.setHL(7);
+			cpu.setN(0x7e);
+			cpu.call(0xcb);
+
+			THEN("zeroFlag == true") {
+				REQUIRE(cpu.getZero() == true);
 			}
 		}
 	}
@@ -559,6 +595,24 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 			THEN("a == 0b01111111, carryFlag == false") {
 				REQUIRE(cpu.getA() == 0b01111111);
 				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("bitting a (1)") {
+			cpu.setN(0x47);
+			cpu.setA(1);
+			cpu.call(0xcb);
+
+			THEN("zeroFlag == false") {
+				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("bitting a (2)") {
+			cpu.setN(0x47);
+			cpu.setA(0b11111110);
+			cpu.call(0xcb);
+
+			THEN("zeroFlag == true") {
+				REQUIRE(cpu.getZero() == true);
 			}
 		}
 	}

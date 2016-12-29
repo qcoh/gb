@@ -143,4 +143,11 @@ class CPU {
 			halfFlag = false;
 			negFlag = false;
 		}
+
+		template <typename T>
+		void BIT(const T& target) {
+			zeroFlag = !target;
+			negFlag = false;
+			halfFlag = true;
+		}
 };
