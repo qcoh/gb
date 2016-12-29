@@ -134,4 +134,13 @@ class CPU {
 			halfFlag = false;
 			negFlag = false;
 		}
+
+		template <typename T>
+		void SRL(T& target) {
+			carryFlag = ((target & 0x1) != 0);
+			target = static_cast<BYTE>(target >> 1);
+			zeroFlag = (target == 0);
+			halfFlag = false;
+			negFlag = false;
+		}
 };

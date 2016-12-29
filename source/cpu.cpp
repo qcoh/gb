@@ -311,6 +311,15 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x35, std::bind(&CPU::SWAP<BYTE>, this, std::ref(l)),		"SWAP L", 8, 0 },
 		{ 0x36, std::bind(&CPU::SWAP<MemRef>, this, MemRef{hl, mmu}),	"SWAP (HL)", 16, 0 },
 		{ 0x37, std::bind(&CPU::SWAP<BYTE>, this, std::ref(a)),		"SWAP A", 8, 0 },
+
+		{ 0x38, std::bind(&CPU::SRL<BYTE>, this, std::ref(b)),		"SRL B", 8, 0 },
+		{ 0x39, std::bind(&CPU::SRL<BYTE>, this, std::ref(c)),		"SRL C", 8, 0 },
+		{ 0x3a, std::bind(&CPU::SRL<BYTE>, this, std::ref(d)),		"SRL D", 8, 0 },
+		{ 0x3b, std::bind(&CPU::SRL<BYTE>, this, std::ref(e)),		"SRL E", 8, 0 },
+		{ 0x3c, std::bind(&CPU::SRL<BYTE>, this, std::ref(h)),		"SRL H", 8, 0 },
+		{ 0x3d, std::bind(&CPU::SRL<BYTE>, this, std::ref(l)),		"SRL L", 8, 0 },
+		{ 0x3e, std::bind(&CPU::SRL<MemRef>, this, MemRef{hl, mmu}),	"SRL (HL)", 16, 0 },
+		{ 0x3f, std::bind(&CPU::SRL<BYTE>, this, std::ref(a)),		"SRL A", 8, 0 },
 	}};
 }
 
