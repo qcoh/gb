@@ -4,16 +4,18 @@
 template <typename T, int I>
 class BitRef {
 	public:
-		BitRef(T& ref) : ptr{&ref} {}
+		BitRef(T& ref) : ptr{ref} {}
 		BitRef(const BitRef&) = default;
 		BitRef& operator=(const BitRef&) = default;
+		BitRef(T&& ref) : ptr{ref} {}
+
 		operator bool () const {
-			return (((*ptr >> I) & 1) != 0);
+			return (((ptr >> I) & 1) != 0);
 		}
 		// TODO: return type?
 		void operator=(bool rhs) {
-			*ptr = (*ptr & (~(1 << I))) | static_cast<T>(rhs << I);
+			ptr = (ptr & (~(1 << I))) | static_cast<T>(rhs << I);
 		}
 	private:
-		T* ptr;
+		T& ptr;
 };
