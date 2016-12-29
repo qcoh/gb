@@ -284,6 +284,24 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x1d, std::bind(&CPU::RR<BYTE>, this, std::ref(l)),		"RR L", 8, 0 },
 		{ 0x1e, std::bind(&CPU::RR<MemRef>, this, MemRef{hl, mmu}),	"RR (HL)", 16, 0 },
 		{ 0x1f, std::bind(&CPU::RR<BYTE>, this, std::ref(a)),		"RR A", 8, 0 },
+
+		{ 0x20, std::bind(&CPU::SLA<BYTE>, this, std::ref(b)),		"SLA B", 8, 0 },
+		{ 0x21, std::bind(&CPU::SLA<BYTE>, this, std::ref(c)),		"SLA C", 8, 0 },
+		{ 0x22, std::bind(&CPU::SLA<BYTE>, this, std::ref(d)),		"SLA D", 8, 0 },
+		{ 0x23, std::bind(&CPU::SLA<BYTE>, this, std::ref(e)),		"SLA E", 8, 0 },
+		{ 0x24, std::bind(&CPU::SLA<BYTE>, this, std::ref(h)),		"SLA H", 8, 0 },
+		{ 0x25, std::bind(&CPU::SLA<BYTE>, this, std::ref(l)),		"SLA L", 8, 0 },
+		{ 0x26, std::bind(&CPU::SLA<MemRef>, this, MemRef{hl, mmu}),	"SLA (HL)", 16, 0 },
+		{ 0x27, std::bind(&CPU::SLA<BYTE>, this, std::ref(a)),		"SLA A", 8, 0 },
+
+		{ 0x28, std::bind(&CPU::SRA<BYTE>, this, std::ref(b)),		"SRA B", 8, 0 },
+		{ 0x29, std::bind(&CPU::SRA<BYTE>, this, std::ref(c)),		"SRA C", 8, 0 },
+		{ 0x2a, std::bind(&CPU::SRA<BYTE>, this, std::ref(d)),		"SRA D", 8, 0 },
+		{ 0x2b, std::bind(&CPU::SRA<BYTE>, this, std::ref(e)),		"SRA E", 8, 0 },
+		{ 0x2c, std::bind(&CPU::SRA<BYTE>, this, std::ref(h)),		"SRA H", 8, 0 },
+		{ 0x2d, std::bind(&CPU::SRA<BYTE>, this, std::ref(l)),		"SRA L", 8, 0 },
+		{ 0x2e, std::bind(&CPU::SRA<MemRef>, this, MemRef{hl, mmu}),	"SRA (HL)", 16, 0 },
+		{ 0x2f, std::bind(&CPU::SRA<BYTE>, this, std::ref(a)),		"SRA A", 8, 0 },
 	}};
 }
 
