@@ -56,19 +56,19 @@ class TestCPU : public CPU {
 			sp = sp_;
 		}
 
-		auto getCarry() -> decltype(carryFlag) {
+		auto getCarry() -> decltype(carryFlag)& {
 			return carryFlag;
 		}
 
-		auto getHalf() -> decltype(halfFlag) {
+		auto getHalf() -> decltype(halfFlag)& {
 			return halfFlag;
 		}
 
-		auto getZero() -> decltype(zeroFlag) {
+		auto getZero() -> decltype(zeroFlag)& {
 			return zeroFlag;
 		}
 
-		auto getNeg() -> decltype(negFlag) {
+		auto getNeg() -> decltype(negFlag)& {
 			return negFlag;
 		}
 };
@@ -432,6 +432,50 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 
 			THEN("a == 0b01111000, carryFlag == false") {
 				REQUIRE(cpu.getA() == 0b01111000);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("rling a (1)") {
+			cpu.setN(0x17);
+			cpu.setA(0);
+			cpu.getCarry() = true;
+			cpu.call(0xcb);
+
+			THEN("a == 0b0000001, carryFlag == false") {
+				REQUIRE(cpu.getA() == 1);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("rling a (2)") {
+			cpu.setN(0x17);
+			cpu.setA(0b10101010);
+			cpu.getCarry() = false;
+			cpu.call(0xcb);
+
+			THEN("a == 0b01010100, carryFlag == true") {
+				REQUIRE(cpu.getA() == 0b01010100);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("rring a (1)") {
+			cpu.setN(0x1f);
+			cpu.setA(0);
+			cpu.getCarry() = true;
+			cpu.call(0xcb);
+
+			THEN("a == 0b10000000, carryFlag == false") {
+				REQUIRE(cpu.getA() == 0b10000000);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("rring a (2)") {
+			cpu.setN(0x1f);
+			cpu.setA(0b10101010);
+			cpu.getCarry() = true;
+			cpu.call(0xcb);
+
+			THEN("a == 0b11010101, carryFlag == false") {
+				REQUIRE(cpu.getA() == 0b11010101);
 				REQUIRE(cpu.getCarry() == false);
 			}
 		}

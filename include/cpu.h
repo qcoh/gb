@@ -87,4 +87,24 @@ class CPU {
 			halfFlag = false;
 			negFlag = false;
 		}
+
+		template <typename T>
+		void RL(T& target) {
+			bool temp = carryFlag;
+			carryFlag = ((target >> 7) != 0);
+			target = static_cast<BYTE>((target << 1) | temp);
+			zeroFlag = (target == 0);
+			halfFlag = false;
+			negFlag = false;
+		}
+
+		template <typename T>
+		void RR(T& target) {
+			bool temp = carryFlag;
+			carryFlag = ((target & 0x1) != 0);
+			target = static_cast<BYTE>((target >> 1) | (temp << 7));
+			zeroFlag = (target == 0);
+			halfFlag = false;
+			negFlag = false;
+		}
 };
