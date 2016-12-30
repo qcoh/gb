@@ -201,6 +201,36 @@ SCENARIO("Testing MemRef", "[cpu]") {
 				REQUIRE(data[0] == 0);
 			}
 		}
+		WHEN("setting (HL)") {
+			cpu.setHL(0);
+			cpu.setN(0xc6);
+			cpu.call(0xcb);
+
+			cpu.setN(0xce);
+			cpu.call(0xcb);
+
+			cpu.setN(0xd6);
+			cpu.call(0xcb);
+
+			cpu.setN(0xde);
+			cpu.call(0xcb);
+
+			cpu.setN(0xe6);
+			cpu.call(0xcb);
+
+			cpu.setN(0xee);
+			cpu.call(0xcb);
+
+			cpu.setN(0xf6);
+			cpu.call(0xcb);
+
+			cpu.setN(0xfe);
+			cpu.call(0xcb);
+
+			THEN("(0) == 0b11111111") {
+				REQUIRE(data[0] == 0b11111111);
+			}
+		}
 	}
 }
 
@@ -654,6 +684,15 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 
 			THEN("a == 0") {
 				REQUIRE(cpu.getA() == 0);
+			}
+		}
+		WHEN("setting a") {
+			cpu.setN(0xc7);
+			cpu.setA(0);
+			cpu.call(0xcb);
+
+			THEN("a == 1") {
+				REQUIRE(cpu.getA() == 1);
 			}
 		}
 	}

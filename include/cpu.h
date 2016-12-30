@@ -155,4 +155,9 @@ class CPU {
 		void RES(T& target) {
 			target = false;
 		}
+
+		template <typename T>
+		void SET(T& target) {
+			target = true;
+		}
 };
