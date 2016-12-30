@@ -76,6 +76,7 @@ class CPU {
 		void RLCA();
 		void RRCA();
 		void RLA();
+		void RRA();
 
 		// extended instruction set
 

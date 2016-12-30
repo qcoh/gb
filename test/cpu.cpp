@@ -563,6 +563,25 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getCarry() == true);
 			}
 		}
+		WHEN("rraing (1)") {
+			cpu.setA(0xff);
+			cpu.call(0x1f);
+			
+			THEN("a == 0b01111111, carryFlag == true") {
+				REQUIRE(cpu.getA() == 0b01111111);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("rraing (2)") {
+			cpu.setA(0);
+			cpu.getCarry() = true;
+			cpu.call(0x1f);
+
+			THEN("a == 0b10000000, carryFlag == false") {
+				REQUIRE(cpu.getA() == 0b10000000);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
 		WHEN("adding words (1)") {
 			cpu.setHL(0x00ff);
 			cpu.setBC(0x00ff);
