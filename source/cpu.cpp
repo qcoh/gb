@@ -44,6 +44,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x0c, std::bind(&CPU::INCb,			this, std::ref(c)),			"INC C",	4, 1 },
 		{ 0x0d, std::bind(&CPU::DECb,			this, std::ref(c)),			"DEC C",	4, 1 },
 		{ 0x0e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(c), std::cref(n)), 	"LD C, n", 	8, 2 },
+		{ 0x0f, std::bind(&CPU::RRCA,			this),					"RRCA",		4, 1 },
 		{ 0x11, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(de), std::cref(nn)), 	"LD DE, nn", 	12, 3 },
 		{ 0x12, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{de, mmu}, std::cref(a)),	"LD (DE), A",	8, 1 },
 		{ 0x13, std::bind(&CPU::INC, 			this, std::ref(de)), 			"INC DE", 	8, 1 },
@@ -693,6 +694,15 @@ void CPU::RLCA() {
 	// slightly different than RLC: zeroFlag is always false
 	carryFlag = ((a >> 7) != 0);
 	a = static_cast<BYTE>((a << 1) | carryFlag);
+	zeroFlag = false;
+	halfFlag = false;
+	negFlag = false;
+}
+
+void CPU::RRCA() {
+	// slightly different than RRC: zeroFlag is always false
+	carryFlag = ((a & 0x1) != 0);
+	a = static_cast<BYTE>((a >> 1) | (carryFlag << 7));
 	zeroFlag = false;
 	halfFlag = false;
 	negFlag = false;
