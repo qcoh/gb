@@ -235,6 +235,15 @@ SCENARIO("Testing MemRef", "[cpu]") {
 				REQUIRE(data[0] == 0b11111111);
 			}
 		}
+		WHEN("lding to (HL)") {
+			cpu.setHL(0);
+			cpu.setB(0xff);
+			cpu.call(0x70);
+
+			THEN("(0) == 0xff") {
+				REQUIRE(data[0] == 0xff);
+			}
+		}
 	}
 }
 

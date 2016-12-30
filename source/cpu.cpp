@@ -138,14 +138,14 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x6f, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(l), std::cref(a)),	"LD L, A",	4, 1 },
 
 
-		//{ 0x70, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(b)),	"LD B, B",	4, 1 },
-		//{ 0x71, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(c)),	"LD B, C",	4, 1 },
-		//{ 0x72, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(d)),	"LD B, D",	4, 1 },
-		//{ 0x73, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(e)),	"LD B, E",	4, 1 },
-		//{ 0x74, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(h)),	"LD B, H",	4, 1 },
-		//{ 0x75, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(l)),	"LD B, L",	4, 1 },
+		{ 0x70, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(b)),	"LD (HL), B",	8, 1 },
+		{ 0x71, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(c)),	"LD (HL), C",	8, 1 },
+		{ 0x72, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(d)),	"LD (HL), D",	8, 1 },
+		{ 0x73, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(e)),	"LD (HL), E",	8, 1 },
+		{ 0x74, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(h)),	"LD (HL), H",	8, 1 },
+		{ 0x75, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(l)),	"LD (HL), L",	8, 1 },
 		// HALT
-		//{ 0x77, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(a)),	"LD B, A",	4, 1 },
+		{ 0x77, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(a)),	"LD (HL), A",	8, 1 },
 	
 		{ 0x78, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(b)),	"LD A, B",	4, 1 },
 		{ 0x79, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(c)),	"LD A, C",	4, 1 },
