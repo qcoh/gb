@@ -150,4 +150,9 @@ class CPU {
 			negFlag = false;
 			halfFlag = true;
 		}
+
+		template <typename T>
+		void RES(T& target) {
+			target = false;
+		}
 };

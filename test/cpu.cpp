@@ -75,8 +75,7 @@ class TestCPU : public CPU {
 
 class TestMMU : public IMMU {
 	public:
-		TestMMU() : data{} {}
-		TestMMU(std::array<BYTE, 1024>&& data_) : data{std::move(data_)} {}
+		TestMMU(std::array<BYTE, 1024>& data_) : data{data_} {}
 
 		BYTE readByte(WORD addr) override {
 			return data[addr];
@@ -86,12 +85,13 @@ class TestMMU : public IMMU {
 			data[addr] = v;
 		}
 
-		std::array<BYTE, 1024> data;
+		std::array<BYTE, 1024>& data;
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 	GIVEN("CPU-derivative with BC and B accessors") {
-		TestMMU mmu{};
+		std::array<BYTE, 1024> data = {{ 0 }};
+		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
 		WHEN("setting bc to 0xff00") {
@@ -109,7 +109,7 @@ SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 SCENARIO("Testing MemRef", "[cpu]") {
 	GIVEN("CPU-derivative") {
 		std::array<BYTE, 1024> data = {{ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0b10101010, 0b01010101 }};
-		TestMMU mmu{std::move(data)};
+		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
 		WHEN("setting hl = 1, reading (hl) to a") {
@@ -171,12 +171,43 @@ SCENARIO("Testing MemRef", "[cpu]") {
 				REQUIRE(cpu.getZero() == true);
 			}
 		}
+		WHEN("resetting (HL)") {
+			cpu.setHL(0);
+			cpu.setN(0x86);
+			cpu.call(0xcb);
+
+			cpu.setN(0x8e);
+			cpu.call(0xcb);
+
+			cpu.setN(0x96);
+			cpu.call(0xcb);
+
+			cpu.setN(0x9e);
+			cpu.call(0xcb);
+
+			cpu.setN(0xa6);
+			cpu.call(0xcb);
+
+			cpu.setN(0xae);
+			cpu.call(0xcb);
+
+			cpu.setN(0xb6);
+			cpu.call(0xcb);
+
+			cpu.setN(0xbe);
+			cpu.call(0xcb);
+
+			THEN("(0) == 0") {
+				REQUIRE(data[0] == 0);
+			}
+		}
 	}
 }
 
 SCENARIO("Testing instructions", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		TestMMU mmu{};
+		std::array<BYTE, 1024> data = {{ 0 }};
+		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
 		WHEN("incrementing bc") {
@@ -438,7 +469,8 @@ SCENARIO("Testing instructions", "[cpu]") {
 
 SCENARIO("Testing extended instructions", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		TestMMU mmu{};
+		std::array<BYTE, 1024> data = {{ 0 }};
+		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
 		WHEN("rlcing a") {
@@ -613,6 +645,15 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 
 			THEN("zeroFlag == true") {
 				REQUIRE(cpu.getZero() == true);
+			}
+		}
+		WHEN("resetting a") {
+			cpu.setN(0x87);
+			cpu.setA(1);
+			cpu.call(0xcb);
+
+			THEN("a == 0") {
+				REQUIRE(cpu.getA() == 0);
 			}
 		}
 	}
