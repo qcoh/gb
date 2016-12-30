@@ -75,7 +75,7 @@ class CPU {
 		// shift and rotate
 		void RLCA();
 		void RRCA();
-
+		void RLA();
 
 		// extended instruction set
 
