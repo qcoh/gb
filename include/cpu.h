@@ -44,21 +44,31 @@ class CPU {
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;
 
-		void INC(WORD&);
-		void DEC(WORD&);
-		void INCb(BYTE&);
-		void DECb(BYTE&);
-
+		// loads
 		template <typename T, typename S>
 		void LD(T& target, const S& source) {
 			target = source;
 		}
+		template <typename T, typename S>
+		void LDI(T& target, const S& source) {
+			target = source;
+			hl++;
+		}
+		template <typename T, typename S>
+		void LDD(T& target, const S& source) {
+			target = source;
+			hl--;
+		}
 
+		// jumps
 		void JR(const bool&, const BYTE&);
 		void JRn(const bool&, const BYTE&);
 		void JP(const bool&, const WORD&);
 		void JPn(const bool&, const WORD&);
 
+		// 8bit arithmetic
+		void INCb(BYTE&);
+		void DECb(BYTE&);
 		void ADD(const BYTE&);
 		void ADC(const BYTE&);
 		void SUB(const BYTE&);
@@ -74,6 +84,8 @@ class CPU {
 
 		// 16bit arithmetic
 		void ADD16(WORD&, const WORD&);
+		void INC(WORD&);
+		void DEC(WORD&);
 
 
 		// shift and rotate

@@ -244,6 +244,44 @@ SCENARIO("Testing MemRef", "[cpu]") {
 				REQUIRE(data[0] == 0xff);
 			}
 		}
+		WHEN("ldi-ing to (hl)") {
+			cpu.setHL(0);
+			cpu.setA(0x44);
+			cpu.call(0x22);
+
+			THEN("(0) == 0x44, hl == 1") {
+				REQUIRE(data[0] == 0x44);
+				REQUIRE(cpu.getHL() == 1);
+			}
+		}
+		WHEN("ldding to (hl)") {
+			cpu.setHL(1);
+			cpu.setA(0x55);
+			cpu.call(0x32);
+
+			THEN("(1) == 0x55, hl == 0") {
+				REQUIRE(data[1] == 0x55);
+				REQUIRE(cpu.getHL() == 0);
+			}
+		}
+		WHEN("ldi-ing from (hl)") {
+			cpu.setHL(0);
+			cpu.call(0x2a);
+
+			THEN("a == 0xaa, hl == 1") {
+				REQUIRE(cpu.getA() == 0xaa);
+				REQUIRE(cpu.getHL() == 1);
+			}
+		}
+		WHEN("ldd-ing from (hl)") {
+			cpu.setHL(1);
+			cpu.call(0x3a);
+
+			THEN("a == 0xbb, hl == 0") {
+				REQUIRE(cpu.getA() == 0xbb);
+				REQUIRE(cpu.getHL() == 0);
+			}
+		}
 	}
 }
 
