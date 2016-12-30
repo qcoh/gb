@@ -70,6 +70,8 @@ class CPU {
 
 		void CB();
 
+		void RLCA();
+
 		template <typename T>
 		void RLC(T& target) {
 			carryFlag = ((target >> 7) != 0);
