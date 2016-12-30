@@ -68,9 +68,17 @@ class CPU {
 		void OR(const BYTE&);
 		void CP(const BYTE&);
 
-		void CB();
+		// 16bit arithmetic
+		void ADD16(WORD&, const WORD&);
 
+
+		// shift and rotate
 		void RLCA();
+
+
+		// extended instruction set
+
+		void CB();
 
 		template <typename T>
 		void RLC(T& target) {

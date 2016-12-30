@@ -52,6 +52,10 @@ class TestCPU : public CPU {
 			hl = hl_;
 		}
 
+		WORD getHL() {
+			return hl;
+		}
+
 		void setSP(WORD sp_) {
 			sp = sp_;
 		}
@@ -511,6 +515,50 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getA() == 0);
 				REQUIRE(cpu.getCarry() == false);
 				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("adding words (1)") {
+			cpu.setHL(0x00ff);
+			cpu.setBC(0x00ff);
+			cpu.call(0x09);
+
+			THEN("hl == 0x01fe, carryFlag == false, halfFlag == false") {
+				REQUIRE(cpu.getHL() == 0x01fe);
+				REQUIRE(cpu.getCarry() == false);
+				REQUIRE(cpu.getHalf() == false);
+			}
+		}
+		WHEN("adding words (2)") {
+			cpu.setHL(0x0f00);
+			cpu.setBC(0x0f00);
+			cpu.call(0x09);
+
+			THEN("hl == 0x1e00, carryFlag == false, halfFlag == true") {
+				REQUIRE(cpu.getHL() == 0x1e00);
+				REQUIRE(cpu.getCarry() == false);
+				REQUIRE(cpu.getHalf() == true);
+			}
+		}
+		WHEN("adding words (3)") {
+			cpu.setHL(0xf000);
+			cpu.setBC(0xf000);
+			cpu.call(0x09);
+
+			THEN("hl == 0xe000, carryFlag == true, halfFlag == false") {
+				REQUIRE(cpu.getHL() == 0xe000);
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getHalf() == false);
+			}
+		}
+		WHEN("adding words (4)") {
+			cpu.setHL(0x1111);
+			cpu.setBC(0x2222);
+			cpu.call(0x09);
+
+			THEN("hl == 0x3333, carryFlag == false, halfFlag == false") {
+				REQUIRE(cpu.getHL() == 0x3333);
+				REQUIRE(cpu.getCarry() == false);
+				REQUIRE(cpu.getHalf() == false);
 			}
 		}
 	}

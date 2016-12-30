@@ -38,6 +38,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x06, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(b), std::cref(n)), 	"LD B, n",	8, 2 },
 		{ 0x07, std::bind(&CPU::RLCA,			this),					"RLCA",		4, 1 },
 		{ 0x08, std::bind(&CPU::LD<MemRef, WORD>,	this, MemRef{nn, mmu}, std::cref(sp)),	"LD (nn), SP",	20, 3 },
+		{ 0x09, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(bc)),	"ADD HL, BC",	8, 1 },
 		{ 0x0a, std::bind(&CPU::LD<BYTE, MemRef>,	this, std::ref(a), MemRef{bc, mmu}),	"LD A, (BC)",	8, 1 },
 		{ 0x0b, std::bind(&CPU::DEC,			this, std::ref(bc)), 			"DEC BC", 	8, 1 },
 		{ 0x0c, std::bind(&CPU::INCb,			this, std::ref(c)),			"INC C",	4, 1 },
@@ -50,6 +51,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x15, std::bind(&CPU::DECb, 			this, std::ref(d)),			"DEC D",	4, 1 },
 		{ 0x16, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(d), std::cref(n)), 	"LD D, n", 	8, 2 },
 		{ 0x18, std::bind(&CPU::JR,			this, true, std::cref(n)),		"JR n",		0, 2 },
+		{ 0x19, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(de)),	"ADD HL, DE",	8, 1 },
 		{ 0x1a, std::bind(&CPU::LD<BYTE, MemRef>,	this, std::ref(a), MemRef{de, mmu}),	"LD A, (DE)",	8, 1 },
 		{ 0x1b, std::bind(&CPU::DEC, 			this, std::ref(de)), 			"DEC DE", 	8, 1 },
 		{ 0x1c, std::bind(&CPU::INCb,			this, std::ref(e)),			"INC E",	4, 1 },
@@ -62,6 +64,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x25, std::bind(&CPU::DECb, 			this, std::ref(h)),			"DEC H",	4, 1 },
 		{ 0x26, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(h), std::cref(n)), 	"LD H, n", 	8, 2 },
 		{ 0x28, std::bind(&CPU::JR,			this, zeroFlag, std::cref(n)),		"JR Z, n",	0, 2 },
+		{ 0x29, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(hl)),	"ADD HL, HL",	8, 1 },
 		{ 0x2b, std::bind(&CPU::DEC, 			this, std::ref(hl)), 			"DEC HL", 	8, 1 },
 		{ 0x2c, std::bind(&CPU::INCb,			this, std::ref(l)),			"INC L",	4, 1 },
 		{ 0x2d, std::bind(&CPU::DECb,			this, std::ref(l)),			"DEC L",	4, 1 },
@@ -72,6 +75,7 @@ CPU::CPU(IMMU& mmu_) :
 		//{ 0x34, std::bind(&CPU::INCb, 			this, MemRef{hl, mmu}),			"INC (HL)",	12, 1 },
 		//{ 0x35, std::bind(&CPU::DECb, 			this, MemRef{hl, mmu}),			"DEC (HL)",	12, 1 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 2 },
+		{ 0x39, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(sp)),	"ADD HL, SP",	8, 1 },
 		{ 0x3b, std::bind(&CPU::DEC,			this, std::ref(sp)), 			"DEC SP", 	8, 1 },
 		{ 0x3c, std::bind(&CPU::INCb,			this, std::ref(a)),			"INC A",	4, 1 },
 		{ 0x3d, std::bind(&CPU::DECb,			this, std::ref(a)),			"DEC A",	4, 1 },
@@ -692,4 +696,12 @@ void CPU::RLCA() {
 	zeroFlag = false;
 	halfFlag = false;
 	negFlag = false;
+}
+
+void CPU::ADD16(WORD& target, const WORD& source) {
+	int temp = target + source;
+	carryFlag = (temp > 0xffff);
+	negFlag = false;
+	halfFlag = ((((target & 0x0fff) + (source & 0x0fff)) & 0xf000) != 0);
+	target = static_cast<WORD>(temp);
 }
