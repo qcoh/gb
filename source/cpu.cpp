@@ -72,17 +72,20 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x2c, std::bind(&CPU::INCb,			this, std::ref(l)),			"INC L",	4, 1 },
 		{ 0x2d, std::bind(&CPU::DECb,			this, std::ref(l)),			"DEC L",	4, 1 },
 		{ 0x2e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(l), std::cref(n)), 	"LD L, n", 	8, 2 },
+		{ 0x2f, std::bind(&CPU::CPL,			this),					"CPL",		4, 1 },
 		{ 0x30, std::bind(&CPU::JRn,			this, carryFlag, std::cref(n)),		"JR NC, n",	0, 2 },
 		{ 0x31, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(sp), std::cref(nn)), 	"LD SP, nn", 	12, 3 },
 		{ 0x33, std::bind(&CPU::INC, 			this, std::ref(sp)), 			"INC SP", 	8, 1 },
 		//{ 0x34, std::bind(&CPU::INCb, 			this, MemRef{hl, mmu}),			"INC (HL)",	12, 1 },
 		//{ 0x35, std::bind(&CPU::DECb, 			this, MemRef{hl, mmu}),			"DEC (HL)",	12, 1 },
+		{ 0x37, std::bind(&CPU::SCF,			this),					"SCF",		4, 1 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 2 },
 		{ 0x39, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(sp)),	"ADD HL, SP",	8, 1 },
 		{ 0x3b, std::bind(&CPU::DEC,			this, std::ref(sp)), 			"DEC SP", 	8, 1 },
 		{ 0x3c, std::bind(&CPU::INCb,			this, std::ref(a)),			"INC A",	4, 1 },
 		{ 0x3d, std::bind(&CPU::DECb,			this, std::ref(a)),			"DEC A",	4, 1 },
 		{ 0x3e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(a), std::cref(n)), 	"LD A, n", 	8, 2 },
+		{ 0x3f, std::bind(&CPU::CCF,			this),					"CCF",		4, 1 },
 		{ 0x40, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(b)),	"LD B, B",	4, 1 },
 		{ 0x41, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(c)),	"LD B, C",	4, 1 },
 		{ 0x42, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(d)),	"LD B, D",	4, 1 },
@@ -736,4 +739,22 @@ void CPU::ADD16(WORD& target, const WORD& source) {
 	negFlag = false;
 	halfFlag = ((((target & 0x0fff) + (source & 0x0fff)) & 0xf000) != 0);
 	target = static_cast<WORD>(temp);
+}
+
+void CPU::CCF() {
+	carryFlag = !carryFlag;
+	negFlag = false;
+	halfFlag = false;
+}
+
+void CPU::SCF() {
+	carryFlag = true;
+	negFlag = false;
+	halfFlag = false;
+}
+
+void CPU::CPL() {
+	a ^= 0xff;
+	negFlag = true;
+	halfFlag = true;
 }

@@ -626,6 +626,29 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == false);
 			}
 		}
+		WHEN("cpling") {
+			cpu.setA(0b10101010);
+			cpu.call(0x2f);
+
+			THEN("a == 0b01010101") {
+				REQUIRE(cpu.getA() == 0b01010101);
+			}
+		}
+		WHEN("ccfing") {
+			cpu.getCarry() = true;
+			cpu.call(0x3f);
+
+			THEN("carryFlag == false") {
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("scfing") {
+			cpu.call(0x37);
+			
+			THEN("carryFlag == true") {
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
 	}
 }
 

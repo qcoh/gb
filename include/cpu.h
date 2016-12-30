@@ -68,6 +68,10 @@ class CPU {
 		void OR(const BYTE&);
 		void CP(const BYTE&);
 
+		void CCF();
+		void SCF();
+		void CPL();
+
 		// 16bit arithmetic
 		void ADD16(WORD&, const WORD&);
 
