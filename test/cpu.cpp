@@ -358,6 +358,17 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getZero() == true);
 			}
 		}
+		WHEN("adding with carry and halfCarry (daa error)") {
+			cpu.setA(0x98);
+			cpu.setB(0x97);
+			cpu.call(0x80);
+
+			THEN("a == 0x2f, carryFlag == true, halfFlag == false") {
+				REQUIRE(cpu.getA() == 0x2f);
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getHalf() == false);
+			}
+		}
 		WHEN("adcing to a") {
 			cpu.setA(0x0e);
 			cpu.setB(0xf0);
@@ -684,6 +695,187 @@ SCENARIO("Testing instructions", "[cpu]") {
 			cpu.call(0x37);
 			
 			THEN("carryFlag == true") {
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+	}
+}
+
+BYTE dec2bcd(BYTE in) {
+	return static_cast<BYTE>(((in / 10) << 4) | (in % 10));
+}
+
+SCENARIO("Testing DAA instruction", "[cpu]") {
+	GIVEN("CPU-derivative") {
+		std::array<BYTE, 1024> data = {{ 0 }};
+		TestMMU mmu{data};
+		TestCPU cpu{mmu};
+
+		WHEN("adding two bcds (without carry, halfCarry") {
+			cpu.setA(0x55);
+			cpu.setB(0x11);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0x66, zeroFlag == false, halfFlag == false, carryFlag == false") {
+				REQUIRE(cpu.getA() == dec2bcd(66));
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == false);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("adding two bcds (with halfCarry, without Carry") {
+			cpu.setA(0x18);
+			cpu.setB(0x04);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0x22, zeroFlag == false, halfFlag == false, carryFlag == false") {
+				REQUIRE(cpu.getA() == dec2bcd(22));
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getHalf() == false);
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("adding two bcds (with carry, without halfCarry)") {
+			cpu.setA(0x99);
+			cpu.setB(0x02);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0x01, zeroFlag == false, carryFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(1));
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("adding two bcds (with carry, with halfCarry)") {
+			cpu.setA(0x98);
+			cpu.setB(0x97);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0x95, carryFlag == true, zeroFlag == false") {
+				REQUIRE(cpu.getA() == dec2bcd(95));
+				REQUIRE(cpu.getZero() == false);
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("adding two bcds to 0 (1)") {
+			cpu.setA(0x23);
+			cpu.setB(0x77);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0, carryFlag == true, zeroFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(0));
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getZero() == true);
+			}
+		}
+		WHEN("adding two bcds to 0 (2)") {
+			cpu.setA(0x50);
+			cpu.setB(0x50);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0, carryFlag == true, zeroFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(0));
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getZero() == true);
+			}
+		}
+		WHEN("adding two bcds to 0 (3)") {
+			cpu.setA(0x99);
+			cpu.setB(0x01);
+			cpu.call(0x80);
+			cpu.call(0x27);
+
+			THEN("a == 0, carryFlag == true, zeroFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(0));
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getZero() == true);
+			}
+		}
+		WHEN("adcing (without carry, halfCarry)") {
+			cpu.setA(0x14);
+			cpu.setB(0x41);
+			cpu.getCarry() = true;
+			cpu.call(0x88);
+			cpu.call(0x27);
+
+			THEN("a == 0x56, carryFlag == false, halfFlag == false, zeroFlag == false") {
+				REQUIRE(cpu.getA() == dec2bcd(56));
+				REQUIRE(cpu.getCarry() == false);
+				REQUIRE(cpu.getHalf() == false);
+				REQUIRE(cpu.getZero() == false);
+			}
+		}
+		WHEN("adcing (without carry, with halfCarry)") {
+			cpu.setA(0x08);
+			cpu.setB(0x01);
+			cpu.getCarry() = true;
+			cpu.call(0x88);
+			cpu.call(0x27);
+
+			THEN("a == 0x10, carryFlag == false") {
+				REQUIRE(cpu.getA() == dec2bcd(10));
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("adcing (with carry, without halfCarry") {
+			cpu.setA(0x99);
+			cpu.setB(0);
+			cpu.getCarry() = true;
+			cpu.call(0x88);
+			cpu.call(0x27);
+
+			THEN("a == 0, carryFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(0));
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("adcing (with carry, with halfCarry)") {
+			cpu.setA(0x99);
+			cpu.setB(0x99);
+			cpu.getCarry() = true;
+			cpu.call(0x88);
+			cpu.call(0x27);
+
+			THEN("a == 0x99, carryFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(99));
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("adcing to 0") {
+			cpu.setA(0x50);
+			cpu.setB(0x49);
+			cpu.getCarry() = true;
+			cpu.call(0x88);
+			cpu.call(0x27);
+
+			THEN("a == 0, carryFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(0));
+				REQUIRE(cpu.getCarry() == true);
+			}
+		}
+		WHEN("incing a (1)") {
+			cpu.setA(0x29);
+			cpu.call(0x3c);
+			cpu.call(0x27);
+
+			THEN("a == 0x30, carryFlag == false") {
+				REQUIRE(cpu.getA() == dec2bcd(30));
+				REQUIRE(cpu.getCarry() == false);
+			}
+		}
+		WHEN("incing a (2)") {
+			cpu.setA(0x99);
+			cpu.call(0x3c);
+			cpu.call(0x27);
+
+			THEN("a == 0, carryFlag == true") {
+				REQUIRE(cpu.getA() == dec2bcd(0));
 				REQUIRE(cpu.getCarry() == true);
 			}
 		}

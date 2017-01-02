@@ -81,12 +81,12 @@ class CPU {
 		void CCF();
 		void SCF();
 		void CPL();
+		void DAA();
 
 		// 16bit arithmetic
 		void ADD16(WORD&, const WORD&);
 		void INC(WORD&);
 		void DEC(WORD&);
-
 
 		// shift and rotate
 		void RLCA();

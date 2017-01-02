@@ -67,6 +67,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x24, std::bind(&CPU::INCb, 			this, std::ref(h)),			"INC H",	4, 1 },
 		{ 0x25, std::bind(&CPU::DECb, 			this, std::ref(h)),			"DEC H",	4, 1 },
 		{ 0x26, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(h), std::cref(n)), 	"LD H, n", 	8, 2 },
+		{ 0x27, std::bind(&CPU::DAA,			this),					"DAA",		4, 1 },
 		{ 0x28, std::bind(&CPU::JR,			this, zeroFlag, std::cref(n)),		"JR Z, n",	0, 2 },
 		{ 0x29, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(hl)),	"ADD HL, HL",	8, 1 },
 		{ 0x2a, std::bind(&CPU::LDI<BYTE, MemRef>,	this, std::ref(a), MemRef{hl, mmu}),	"LDI A, (HL+)", 8, 1 },
@@ -761,4 +762,39 @@ void CPU::CPL() {
 	a ^= 0xff;
 	negFlag = true;
 	halfFlag = true;
+}
+
+#include <iostream>
+
+void CPU::DAA() {
+	// see: http://www.worldofspectrum.org/faq/reference/z80reference.htm#DAA
+	//BYTE oldA = a;
+	int temp = a;
+	BYTE correction = 0x00;
+
+	if (a > 0x99 || carryFlag) {
+		correction |= 0x60;
+		carryFlag = true;
+	}
+	//nop:
+	//else {
+	//	correction |= 0x00;
+	//	carryFlag = false;
+	//}
+	
+	if ((a & 0x0f) > 0x9 || halfFlag) {
+		correction |= 0x06;
+	}
+	// nop:
+	// else {
+	// 	correction |= 0x00;
+	// }
+	
+	temp = (negFlag) ? (temp-correction) : (temp+correction);
+
+	// halfFlag is always false in gameboy cpu
+	// halfFlag = (((oldA ^ a) & 0b0001000) != 0);
+	halfFlag = false;
+	a = static_cast<BYTE>(temp);
+	zeroFlag = (a == 0);
 }
