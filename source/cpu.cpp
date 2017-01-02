@@ -764,8 +764,6 @@ void CPU::CPL() {
 	halfFlag = true;
 }
 
-#include <iostream>
-
 void CPU::DAA() {
 	// see: http://www.worldofspectrum.org/faq/reference/z80reference.htm#DAA
 	//BYTE oldA = a;
