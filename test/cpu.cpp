@@ -48,6 +48,14 @@ class TestCPU : public CPU {
 			return a;
 		}
 
+		void setC(BYTE c_) {
+			c = c_;
+		}
+
+		BYTE getC() {
+			return c;
+		}
+
 		void setHL(WORD hl_) {
 			hl = hl_;
 		}
@@ -280,6 +288,39 @@ SCENARIO("Testing MemRef", "[cpu]") {
 			THEN("a == 0xbb, hl == 0") {
 				REQUIRE(cpu.getA() == 0xbb);
 				REQUIRE(cpu.getHL() == 0);
+			}
+		}
+	}
+}
+
+SCENARIO("Testing OffsetRef", "[cpu]") {
+	GIVEN("CPU-derivative") {
+		std::array<BYTE, 1024> data = {{ 0 }};
+		TestMMU mmu{data};
+		TestCPU cpu{mmu};
+
+		WHEN("Writing to c+0xff00") {
+			cpu.setA(0x74);
+			cpu.setC(0x05);
+			cpu.call(0xe2);
+			
+			// read to b from 0x74
+			cpu.setHL(0xff05);
+			cpu.call(0x70);
+
+			THEN("b == 0x74") {
+				REQUIRE(cpu.getB() == 0x74);
+			}
+		}
+		WHEN("Reading from c+0xff00") {
+			cpu.setHL(0xff23);
+			cpu.setA(0x89);
+			cpu.call(0x77);
+
+			cpu.call(0xf2);
+
+			THEN("c == 0x89") {
+				REQUIRE(cpu.getC() == 0x89);
 			}
 		}
 	}

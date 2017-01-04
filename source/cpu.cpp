@@ -7,6 +7,7 @@
 
 #include "cpu.h"
 #include "memref.h"
+#include "offsetref.h"
 
 CPU::CPU(IMMU& mmu_, bool debugMode_) :
 	debugMode{debugMode_},
@@ -279,7 +280,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{},
 		{},
 		{},
-		{},
+		{ 0xe2, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{c, mmu}, std::cref(a)), "LD (C+0xff00), A", 1, 8 },
 		{},
 		{},
 		{},
@@ -294,7 +295,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xee, std::bind(&CPU::XOR,		this, std::cref(n)),			"XOR A, n",	8, 2 },
 		{},
 		{},
-		{},
+		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 1, 8 },
 		{},
 		{},
 		{},
