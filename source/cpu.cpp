@@ -251,7 +251,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
 		{}, // 0xcc
-		{ 0xcd, std::bind(&CPU::CALL,		this, std::cref(nn)),			"CALL nn",	24, 3 },
+		{ 0xcd, std::bind(&CPU::CALL,		this, std::cref(nn)),			"CALL nn",	24, 0 }, // Takes WORD argument!!!
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 2 },
 		{}, // 0xcf
 		
