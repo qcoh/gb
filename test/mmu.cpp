@@ -1,14 +1,24 @@
-#include <memory>
+#include <array>
 
 #include "catch.hpp"
-#include "romonly.h"
-#include "mmu.h"
+#include "immu.h"
+
+class TestMMU : public IMMU {
+	public:
+		TestMMU(std::array<BYTE, 1024>& data_) : data{data_} {}
+		BYTE readByte(WORD addr) override {
+			return data[addr];
+		}
+		void writeByte(WORD addr, BYTE v) override {
+			data[addr] = v;
+		}
+		std::array<BYTE, 1024>& data;
+};
 
 SCENARIO("reading a WORD (from bios) should have correct endianness", "[mmu]") {
 	GIVEN("a MMU containing an emptry RomOnly") {
-		std::vector<BYTE> data = { 0xfe, 0xff };
-		auto ptr = std::make_unique<RomOnly>(std::move(data));
-		MMU mmu{std::move(ptr)};
+		std::array<BYTE, 1024> data = {{ 0xfe, 0xff }};
+		TestMMU mmu{data};
 
 		WHEN("reading a WORD") {
 			WORD w = mmu.readWord(0);
