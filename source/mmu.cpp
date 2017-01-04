@@ -30,7 +30,6 @@ BYTE MMU::readByte(WORD addr) {
 		if (biosMode && addr < 0x100) {
 			return bios[addr];
 		} else {
-			biosMode = false;
 			return mapper->readByte(addr);
 		}
 	}
