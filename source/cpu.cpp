@@ -50,6 +50,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x0d, std::bind(&CPU::DECb,			this, std::ref(c)),			"DEC C",	4, 1 },
 		{ 0x0e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(c), std::cref(n)), 	"LD C, n", 	8, 2 },
 		{ 0x0f, std::bind(&CPU::RRCA,			this),					"RRCA",		4, 1 },
+
 		{},
 		{ 0x11, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(de), std::cref(nn)), 	"LD DE, nn", 	12, 3 },
 		{ 0x12, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{de, mmu}, std::cref(a)),	"LD (DE), A",	8, 1 },
@@ -66,6 +67,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x1d, std::bind(&CPU::DECb,			this, std::ref(e)),			"DEC E",	4, 1 },
 		{ 0x1e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(e), std::cref(n)), 	"LD E, n", 	8, 2 },
 		{ 0x1f, std::bind(&CPU::RRA,			this),					"RRA",		4, 1 },
+
 		{ 0x20, std::bind(&CPU::JRn,			this, zeroFlag, std::cref(n)),		"JR NZ, n",	0, 2 },
 		{ 0x21, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(hl), std::cref(nn)), 	"LD HL, nn", 	12, 3 },
 		{ 0x22, std::bind(&CPU::LDI<MemRef, BYTE>,	this, MemRef{hl, mmu}, std::cref(a)),	"LDI (HL+), A", 8, 1 },
@@ -82,15 +84,14 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x2d, std::bind(&CPU::DECb,			this, std::ref(l)),			"DEC L",	4, 1 },
 		{ 0x2e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(l), std::cref(n)), 	"LD L, n", 	8, 2 },
 		{ 0x2f, std::bind(&CPU::CPL,			this),					"CPL",		4, 1 },
+
 		{ 0x30, std::bind(&CPU::JRn,			this, carryFlag, std::cref(n)),		"JR NC, n",	0, 2 },
 		{ 0x31, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(sp), std::cref(nn)), 	"LD SP, nn", 	12, 3 },
 		{ 0x32, std::bind(&CPU::LDD<MemRef, BYTE>,	this, MemRef{hl, mmu}, std::cref(a)),	"LDD (HL-), A", 8, 1 },
 		{ 0x33, std::bind(&CPU::INC, 			this, std::ref(sp)), 			"INC SP", 	8, 1 },
-		{},
-		{},
-		{},
-		//{ 0x34, std::bind(&CPU::INCb, 			this, MemRef{hl, mmu}),			"INC (HL)",	12, 1 },
-		//{ 0x35, std::bind(&CPU::DECb, 			this, MemRef{hl, mmu}),			"DEC (HL)",	12, 1 },
+		{}, // 0x34
+		{}, // 0x35
+		{}, // 0x36
 		{ 0x37, std::bind(&CPU::SCF,			this),					"SCF",		4, 1 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 2 },
 		{ 0x39, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(sp)),	"ADD HL, SP",	8, 1 },
@@ -100,6 +101,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x3d, std::bind(&CPU::DECb,			this, std::ref(a)),			"DEC A",	4, 1 },
 		{ 0x3e, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(a), std::cref(n)), 	"LD A, n", 	8, 2 },
 		{ 0x3f, std::bind(&CPU::CCF,			this),					"CCF",		4, 1 },
+
 		{ 0x40, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(b)),	"LD B, B",	4, 1 },
 		{ 0x41, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(c)),	"LD B, C",	4, 1 },
 		{ 0x42, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(d)),	"LD B, D",	4, 1 },
@@ -108,7 +110,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x45, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(l)),	"LD B, L",	4, 1 },
 		{ 0x46, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), MemRef{hl, mmu}),	"LD B, (HL)",	8, 1 },
 		{ 0x47, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(b), std::cref(a)),	"LD B, A",	4, 1 },
-		
 		{ 0x48, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(c), std::cref(b)),	"LD C, B",	4, 1 },
 		{ 0x49, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(c), std::cref(c)),	"LD C, C",	4, 1 },
 		{ 0x4a, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(c), std::cref(d)),	"LD C, D",	4, 1 },
@@ -126,7 +127,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x55, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(d), std::cref(l)),	"LD D, L",	4, 1 },
 		{ 0x56, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(d), MemRef{hl, mmu}),	"LD D, (HL)",	8, 1 },
 		{ 0x57, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(d), std::cref(a)),	"LD D, A",	4, 1 },
-		
 		{ 0x58, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(e), std::cref(b)),	"LD E, B",	4, 1 },
 		{ 0x59, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(e), std::cref(c)),	"LD E, C",	4, 1 },
 		{ 0x5a, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(e), std::cref(d)),	"LD E, D",	4, 1 },
@@ -144,7 +144,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x65, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(h), std::cref(l)),	"LD H, L",	4, 1 },
 		{ 0x66, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(h), MemRef{hl, mmu}),	"LD H, (HL)",	8, 1 },
 		{ 0x67, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(h), std::cref(a)),	"LD H, A",	4, 1 },
-		
 		{ 0x68, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(l), std::cref(b)),	"LD L, B",	4, 1 },
 		{ 0x69, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(l), std::cref(c)),	"LD L, C",	4, 1 },
 		{ 0x6a, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(l), std::cref(d)),	"LD L, D",	4, 1 },
@@ -160,10 +159,8 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x73, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(e)),	"LD (HL), E",	8, 1 },
 		{ 0x74, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(h)),	"LD (HL), H",	8, 1 },
 		{ 0x75, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(l)),	"LD (HL), L",	8, 1 },
-		// HALT
-		{},
+		{}, // 0x76
 		{ 0x77, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(a)),	"LD (HL), A",	8, 1 },
-	
 		{ 0x78, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(b)),	"LD A, B",	4, 1 },
 		{ 0x79, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(c)),	"LD A, C",	4, 1 },
 		{ 0x7a, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(d)),	"LD A, D",	4, 1 },
@@ -181,7 +178,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x85, std::bind(&CPU::ADD,		this, std::cref(l)),			"ADD A, L",	4, 1 },
 		{ 0x86, std::bind(&CPU::ADD,		this, MemRef{hl, mmu}),			"ADD A, (HL)",	8, 1 },
 		{ 0x87, std::bind(&CPU::ADD,		this, std::cref(a)),			"ADD A, A",	4, 1 },
-
 		{ 0x88, std::bind(&CPU::ADC,		this, std::cref(b)),			"ADC A, B",	4, 1 },
 		{ 0x89, std::bind(&CPU::ADC,		this, std::cref(c)),			"ADC A, C",	4, 1 },
 		{ 0x8a, std::bind(&CPU::ADC,		this, std::cref(d)),			"ADC A, D",	4, 1 },
@@ -199,7 +195,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x95, std::bind(&CPU::SUB,		this, std::cref(l)),			"SUB A, L",	4, 1 },
 		{ 0x96, std::bind(&CPU::SUB,		this, MemRef{hl, mmu}),			"SUB A, (HL)",	8, 1 },
 		{ 0x97, std::bind(&CPU::SUB,		this, std::cref(a)),			"SUB A, A",	4, 1 },
-
 		{ 0x98, std::bind(&CPU::SBC,		this, std::cref(b)),			"SBC A, B",	4, 1 },
 		{ 0x99, std::bind(&CPU::SBC,		this, std::cref(c)),			"SBC A, C",	4, 1 },
 		{ 0x9a, std::bind(&CPU::SBC,		this, std::cref(d)),			"SBC A, D",	4, 1 },
@@ -217,7 +212,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xa5, std::bind(&CPU::AND,		this, std::cref(l)),			"ADD A, L",	4, 1 },
 		{ 0xa6, std::bind(&CPU::AND,		this, MemRef{hl, mmu}),			"ADD A, (HL)",	8, 1 },
 		{ 0xa7, std::bind(&CPU::AND,		this, std::cref(a)),			"ADD A, A",	4, 1 },
-
 		{ 0xa8, std::bind(&CPU::XOR,		this, std::cref(b)),			"XOR A, B",	4, 1 },
 		{ 0xa9, std::bind(&CPU::XOR,		this, std::cref(c)),			"XOR A, C",	4, 1 },
 		{ 0xaa, std::bind(&CPU::XOR,		this, std::cref(d)),			"XOR A, D",	4, 1 },
@@ -235,7 +229,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xb5, std::bind(&CPU::OR,		this, std::cref(l)),			"OR A, L",	4, 1 },
 		{ 0xb6, std::bind(&CPU::OR,		this, MemRef{hl, mmu}),			"OR A, (HL)",	8, 1 },
 		{ 0xb7, std::bind(&CPU::OR,		this, std::cref(a)),			"OR A, A",	4, 1 },
-
 		{ 0xb8, std::bind(&CPU::CP,		this, std::cref(b)),			"CP A, B",	4, 1 },
 		{ 0xb9, std::bind(&CPU::CP,		this, std::cref(c)),			"CP A, C",	4, 1 },
 		{ 0xba, std::bind(&CPU::CP,		this, std::cref(d)),			"CP A, D",	4, 1 },
@@ -245,70 +238,73 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xbe, std::bind(&CPU::CP,		this, MemRef{hl, mmu}),			"CP A, (HL)",	8, 1 },
 		{ 0xbf, std::bind(&CPU::CP,		this, std::cref(a)),			"CP A, A",	4, 1 },
 		
-		{},
-		{},
+		{}, // 0xc0
+		{}, // 0xc1
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
-		{},
-		{},
+		{}, // 0xc4
+		{}, // 0xc5
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 2 },
-		{},
-		{},
-		{},
+		{}, // 0xc7
+		{}, // 0xc8
+		{}, // 0xc9
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
-		{},
-		{},
+		{}, // 0xcc
+		{}, // 0xcd
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 2 },
-		{},
-		{},
-		{},
+		{}, // 0xcf
+		
+		{}, // 0xd0
+		{}, // 0xd1
 		{ 0xd2, std::bind(&CPU::JPn,		this, carryFlag, std::cref(nn)),	"JP NC, nn",	0, 3 },
-		{},
-		{},
-		{},
-		{},
+		{}, // 0xd3
+		{}, // 0xd4
+		{}, // 0xd5
 		{ 0xd6, std::bind(&CPU::SUB,		this, std::cref(n)),			"SUB A, n",	8, 2 },
-		{},
-		{},
-		{},
+		{}, // 0xd7
+		{}, // 0xd8
+		{}, // 0xd9
 		{ 0xda, std::bind(&CPU::JP,		this, carryFlag, std::cref(nn)),	"JP C, nn", 	0, 3 },
-		{},
-		{},
-		{},
+		{}, // 0xdb
+		{}, // 0xdc
+		{}, // 0xdd
 		{ 0xde, std::bind(&CPU::SBC,		this, std::cref(n)),			"SBC A, n",	8, 2 },
-		{},
-		{},
-		{},
+		{}, // 0xdf
+		
+		{}, // 0xe0
+		{}, // 0xe1
 		{ 0xe2, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{c, mmu}, std::cref(a)), "LD (C+0xff00), A", 1, 8 },
-		{},
-		{},
-		{},
+		{}, // 0xe3
+		{}, // 0xe4
+		{}, // 0xe5
 		{ 0xe6, std::bind(&CPU::AND,		this, std::cref(n)),			"AND A, n",	8, 2 },
-		{},
-		{},
-		{},
-		{},
-		{},
-		{},
-		{},
+		{}, // 0xe7
+		{}, // 0xe8
+		{}, // 0xe9
+		{}, // 0xea
+		{}, // 0xeb
+		{}, // 0xec
+		{}, // 0xed
 		{ 0xee, std::bind(&CPU::XOR,		this, std::cref(n)),			"XOR A, n",	8, 2 },
-		{},
-		{},
+		{}, // 0xef
+
+		{}, // 0xf0
+		{}, // 0xf1
 		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 1, 8 },
-		{},
-		{},
-		{},
+		{}, // 0xf3
+		{}, // 0xf4
+		{}, // 0xf5
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 2 },
-		{},
-		{},
-		{},
-		{},
-		{},
-		{},
-		{},
+		{}, // 0xf7
+		{}, // 0xf8
+		{}, // 0xf9
+		{}, // 0xfa
+		{}, // 0xfb
+		{}, // 0xfc
+		{}, // 0xfd
 		{ 0xfe, std::bind(&CPU::CP,		this, std::cref(n)),			"CP A, n",	8, 2 },
-		{},
+		{}, // 0xff
 	}};
 
 	extended = {{
@@ -606,7 +602,7 @@ void CPU::step() {
 	auto rb = mmu.readByte(pc);
 	auto& op = instructions[rb];
 	if (op.opcode != rb) {
-		std::cout << "Missing instruction: 0x" << std::hex << +rb << '\n';
+		std::cout << "Missing instruction: 0x" << std::hex << +rb << " (0x" << std::hex << +op.opcode << ")\n";
 		throw std::runtime_error{"Missing instruction"};
 	}
 	n = mmu.readByte(pc+1);

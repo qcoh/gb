@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
 		while (true) {
 			cpu.step();
-			std::cin.get();
+			//std::cin.get();
 		}
 	} catch (std::exception& e) {
 		std::cerr << e.what() << '\n';
