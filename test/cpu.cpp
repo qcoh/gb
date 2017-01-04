@@ -68,6 +68,18 @@ class TestCPU : public CPU {
 			sp = sp_;
 		}
 
+		WORD getSP() {
+			return sp;
+		}
+
+		void setPC(WORD pc_) {
+			pc = pc_;
+		}
+
+		WORD getPC() {
+			return pc;
+		}
+
 		auto getCarry() -> decltype(carryFlag)& {
 			return carryFlag;
 		}
@@ -1144,6 +1156,29 @@ SCENARIO("Testing extended instructions", "[cpu]") {
 
 			THEN("a == 1") {
 				REQUIRE(cpu.getA() == 1);
+			}
+		}
+	}
+}
+
+SCENARIO("Testing control-flow instructions", "[cpu]") {
+	GIVEN("CPU-derivative") {
+		std::array<BYTE, 0x10000> data = {{ 0 }};
+		TestMMU mmu{data};
+		TestCPU cpu{mmu};
+
+		WHEN("Calling function") {
+			cpu.setPC(0x1234);
+			cpu.setSP(0xffff);
+			cpu.setNN(0x7788);
+
+			cpu.call(0xcd);
+
+			THEN("pc == 0x7788, sp == 0xfffd, (0xfffe) == 0x12, (0xfffd) == 0x34") {
+				REQUIRE(cpu.getPC() == 0x7788);
+				REQUIRE(cpu.getSP() == 0xfffd);
+				REQUIRE(data[0xfffe] == 0x12);
+				REQUIRE(data[0xfffd] == 0x34);
 			}
 		}
 	}

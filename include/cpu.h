@@ -62,11 +62,13 @@ class CPU {
 			hl--;
 		}
 
-		// jumps
+		// controlflow
 		void JR(const bool&, const BYTE&);
 		void JRn(const bool&, const BYTE&);
 		void JP(const bool&, const WORD&);
 		void JPn(const bool&, const WORD&);
+
+		void CALL(const WORD&);
 
 		// 8bit arithmetic
 		void INCb(BYTE&);

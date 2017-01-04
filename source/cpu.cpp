@@ -251,7 +251,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
 		{}, // 0xcc
-		{}, // 0xcd
+		{ 0xcd, std::bind(&CPU::CALL,		this, std::cref(nn)),			"CALL nn",	24, 3 },
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 2 },
 		{}, // 0xcf
 		
@@ -855,4 +855,11 @@ void CPU::DAA() {
 	halfFlag = false;
 	a = static_cast<BYTE>(temp);
 	zeroFlag = (a == 0);
+}
+
+void CPU::CALL(const WORD& addr) {
+	mmu.writeByte(sp-1, pc >> 8);
+	mmu.writeByte(sp-2, pc & 0xff);
+	sp -= 2;
+	pc = addr;
 }
