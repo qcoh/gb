@@ -19,21 +19,22 @@ std::array<BYTE, 256> MMU::bios{{
 	0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50,
 }};
 
-MMU::MMU(std::unique_ptr<Mapper> mapper_) : 
+MMU::MMU(std::unique_ptr<Mapper>&& mapper_) : 
 	mapper{std::move(mapper_)},
 	biosMode{true}
 {
-	// unused error
-	(void)biosMode;
 }
 
 BYTE MMU::readByte(WORD addr) {
-	//if (/*0 <= addr &&*/ addr < 0x2000) {
-	//	if (biosMode && addr < 0x100) {
-	//		return bios[addr];
-	//	}
-	//}
-	// TODO
+	if (addr < 0x2000) {
+		if (biosMode && addr < 0x100) {
+			return bios[addr];
+		} else {
+			biosMode = false;
+			return mapper->readByte(addr);
+		}
+	}
+	// TODO:
 	return mapper->readByte(addr);
 }
 

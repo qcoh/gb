@@ -1,11 +1,15 @@
 #include <functional>
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
+#include <bitset>
+
 #include "cpu.h"
 #include "memref.h"
 
-CPU::CPU(IMMU& mmu_) :
+CPU::CPU(IMMU& mmu_, bool debugMode_) :
+	debugMode{debugMode_},
 	mmu{mmu_},
 	pc{0},
 	sp{0},
@@ -113,7 +117,6 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x4e, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(c), MemRef{hl, mmu}),	"LD C, (HL)",	8, 1 },
 		{ 0x4f, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(c), std::cref(a)),	"LD C, A",	4, 1 },
 
-
 		{ 0x50, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(d), std::cref(b)),	"LD D, B",	4, 1 },
 		{ 0x51, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(d), std::cref(c)),	"LD D, C",	4, 1 },
 		{ 0x52, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(d), std::cref(d)),	"LD D, D",	4, 1 },
@@ -131,7 +134,6 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x5d, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(e), std::cref(l)),	"LD E, L",	4, 1 },
 		{ 0x5e, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(e), MemRef{hl, mmu}),	"LD E, (HL)",	8, 1 },
 		{ 0x5f, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(e), std::cref(a)),	"LD E, A",	4, 1 },
-
 
 		{ 0x60, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(h), std::cref(b)),	"LD H, B",	4, 1 },
 		{ 0x61, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(h), std::cref(c)),	"LD H, C",	4, 1 },
@@ -151,7 +153,6 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x6e, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(l), MemRef{hl, mmu}),	"LD L, (HL)",	8, 1 },
 		{ 0x6f, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(l), std::cref(a)),	"LD L, A",	4, 1 },
 
-
 		{ 0x70, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(b)),	"LD (HL), B",	8, 1 },
 		{ 0x71, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(c)),	"LD (HL), C",	8, 1 },
 		{ 0x72, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(d)),	"LD (HL), D",	8, 1 },
@@ -159,6 +160,7 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0x74, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(h)),	"LD (HL), H",	8, 1 },
 		{ 0x75, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(l)),	"LD (HL), L",	8, 1 },
 		// HALT
+		{},
 		{ 0x77, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{hl, mmu}, std::cref(a)),	"LD (HL), A",	8, 1 },
 	
 		{ 0x78, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(b)),	"LD A, B",	4, 1 },
@@ -242,31 +244,70 @@ CPU::CPU(IMMU& mmu_) :
 		{ 0xbe, std::bind(&CPU::CP,		this, MemRef{hl, mmu}),			"CP A, (HL)",	8, 1 },
 		{ 0xbf, std::bind(&CPU::CP,		this, std::cref(a)),			"CP A, A",	4, 1 },
 		
+		{},
+		{},
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
-
+		{},
+		{},
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 2 },
-
+		{},
+		{},
+		{},
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
-
+		{},
+		{},
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 2 },
-
+		{},
+		{},
+		{},
 		{ 0xd2, std::bind(&CPU::JPn,		this, carryFlag, std::cref(nn)),	"JP NC, nn",	0, 3 },
-
+		{},
+		{},
+		{},
+		{},
 		{ 0xd6, std::bind(&CPU::SUB,		this, std::cref(n)),			"SUB A, n",	8, 2 },
-
+		{},
+		{},
+		{},
 		{ 0xda, std::bind(&CPU::JP,		this, carryFlag, std::cref(nn)),	"JP C, nn", 	0, 3 },
-
+		{},
+		{},
+		{},
 		{ 0xde, std::bind(&CPU::SBC,		this, std::cref(n)),			"SBC A, n",	8, 2 },
-
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
 		{ 0xe6, std::bind(&CPU::AND,		this, std::cref(n)),			"AND A, n",	8, 2 },
-
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
 		{ 0xee, std::bind(&CPU::XOR,		this, std::cref(n)),			"XOR A, n",	8, 2 },
-
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 2 },
-
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
+		{},
 		{ 0xfe, std::bind(&CPU::CP,		this, std::cref(n)),			"CP A, n",	8, 2 },
+		{},
 	}};
 
 	extended = {{
@@ -564,8 +605,26 @@ void CPU::step() {
 	auto rb = mmu.readByte(pc);
 	auto& op = instructions[rb];
 	if (op.opcode != rb) {
-		std::cout << "Missing instruction: 0x" << std::ios::hex << rb << '\n';
+		std::cout << "Missing instruction: 0x" << std::hex << +rb << '\n';
 		throw std::runtime_error{"Missing instruction"};
+	}
+	n = mmu.readByte(pc+1);
+	nn  = mmu.readWord(pc+1);
+
+	if (debugMode) {
+		std::cout << "PC: 0x" << std::setfill('0') << std::setw(4) << std::hex << +pc << '\n';
+		std::cout << "SP: 0x" << std::setfill('0') << std::setw(4) << std::hex << +sp << '\n';
+		std::cout << "AF: 0x" << std::setfill('0') << std::setw(4) << std::hex << +af << " == 0b" << std::bitset<16>(af) << " = [f: " << std::bitset<8>(f) << "][a: " << std::bitset<8>(a) << "]\n";
+		std::cout << "BC: 0x" << std::setfill('0') << std::setw(4) << std::hex << +bc << " == 0b" << std::bitset<16>(bc) << " = [c: " << std::bitset<8>(c) << "][b: " << std::bitset<8>(b) << "]\n";
+		std::cout << "DE: 0x" << std::setfill('0') << std::setw(4) << std::hex << +de << " == 0b" << std::bitset<16>(de) << " = [e: " << std::bitset<8>(e) << "][d: " << std::bitset<8>(d) << "]\n";
+		std::cout << "HL: 0x" << std::setfill('0') << std::setw(4) << std::hex << +hl << " == 0b" << std::bitset<16>(hl) << " = [l: " << std::bitset<8>(l) << "][h: " << std::bitset<8>(h) << "]\n";
+		std::cout << "NN: 0x" << std::setfill('0') << std::setw(4) << std::hex << +nn << " == 0b" << std::bitset<16>(nn) << '\n';
+		std::cout << "N:  0x" << std::setfill('0') << std::setw(2) << std::hex << +n << " == 0b" << std::bitset<8>(n) << '\n';
+		std::cout << "Instruction: 0x" << std::hex << +rb << " = " << op.description;
+		if (rb == 0xcb) {
+			std::cout << " " << extended[n].description;
+		}
+		std::cout << "\n----\n\n";
 	}
 	op.f();
 	cycles += op.cycles;

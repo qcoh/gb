@@ -7,10 +7,12 @@
 
 class CPU {
 	public:
-		CPU(IMMU&);
+		CPU(IMMU&, bool = false);
 
 		void step();
 	protected:
+		bool debugMode;
+
 		IMMU& mmu;
 
 		WORD pc;

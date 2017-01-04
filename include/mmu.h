@@ -9,7 +9,7 @@
 
 class MMU : public IMMU {
 	public:
-		MMU(std::unique_ptr<Mapper>);
+		MMU(std::unique_ptr<Mapper>&&);
 
 		virtual BYTE readByte(WORD) override;
 		virtual void writeByte(WORD, BYTE) override;
