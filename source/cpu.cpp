@@ -272,7 +272,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xde, std::bind(&CPU::SBC,		this, std::cref(n)),			"SBC A, n",	8, 2 },
 		{}, // 0xdf
 		
-		{}, // 0xe0
+		{ 0xe0, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{n, mmu}, std::cref(a)), "LD (N+0xff00), A", 2, 12 },
 		{}, // 0xe1
 		{ 0xe2, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{c, mmu}, std::cref(a)), "LD (C+0xff00), A", 1, 8 },
 		{}, // 0xe3
@@ -289,7 +289,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xee, std::bind(&CPU::XOR,		this, std::cref(n)),			"XOR A, n",	8, 2 },
 		{}, // 0xef
 
-		{}, // 0xf0
+		{ 0xf0, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(a), OffsetRef<0xff00>{n, mmu}), "LD A, (N+0xff00)", 2, 12 },
 		{}, // 0xf1
 		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 1, 8 },
 		{}, // 0xf3

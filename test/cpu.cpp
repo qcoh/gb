@@ -324,6 +324,30 @@ SCENARIO("Testing OffsetRef", "[cpu]") {
 				REQUIRE(cpu.getC() == 0x89);
 			}
 		}
+		WHEN("Writing to n+0xff00") {
+			cpu.setN(0x11);
+			cpu.setA(0x66);
+			cpu.call(0xe0);
+
+			cpu.setHL(0xff11);
+			cpu.call(0x46);
+
+			THEN("b == 0x66") {
+				REQUIRE(cpu.getB() == 0x66);
+			}
+		}
+		WHEN("Reading from n+0xff00") {
+			cpu.setHL(0xff34);
+			cpu.setB(0x12);
+			cpu.call(0x70);
+
+			cpu.setN(0x34);
+			cpu.call(0xf0);
+
+			THEN("a == 0x12") {
+				REQUIRE(cpu.getA() == 0x12);
+			}
+		}
 	}
 }
 
