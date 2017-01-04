@@ -87,7 +87,7 @@ class TestCPU : public CPU {
 
 class TestMMU : public IMMU {
 	public:
-		TestMMU(std::array<BYTE, 1024>& data_) : data{data_} {}
+		TestMMU(std::array<BYTE, 0x10000>& data_) : data{data_} {}
 
 		BYTE readByte(WORD addr) override {
 			return data[addr];
@@ -97,12 +97,12 @@ class TestMMU : public IMMU {
 			data[addr] = v;
 		}
 
-		std::array<BYTE, 1024>& data;
+		std::array<BYTE, 0x10000>& data;
 };
 
 SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 	GIVEN("CPU-derivative with BC and B accessors") {
-		std::array<BYTE, 1024> data = {{ 0 }};
+		std::array<BYTE, 0x10000> data = {{ 0 }};
 		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
@@ -120,7 +120,7 @@ SCENARIO("WORD registers should have correct endianness", "[cpu]") {
 
 SCENARIO("Testing MemRef", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::array<BYTE, 1024> data = {{ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0b10101010, 0b01010101 }};
+		std::array<BYTE, 0x10000> data = {{ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0b10101010, 0b01010101 }};
 		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
@@ -295,7 +295,7 @@ SCENARIO("Testing MemRef", "[cpu]") {
 
 SCENARIO("Testing OffsetRef", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::array<BYTE, 1024> data = {{ 0 }};
+		std::array<BYTE, 0x10000> data = {{ 0 }};
 		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
@@ -304,9 +304,9 @@ SCENARIO("Testing OffsetRef", "[cpu]") {
 			cpu.setC(0x05);
 			cpu.call(0xe2);
 			
-			// read to b from 0x74
+			// read to b from 0xff05
 			cpu.setHL(0xff05);
-			cpu.call(0x70);
+			cpu.call(0x46);
 
 			THEN("b == 0x74") {
 				REQUIRE(cpu.getB() == 0x74);
@@ -317,6 +317,7 @@ SCENARIO("Testing OffsetRef", "[cpu]") {
 			cpu.setA(0x89);
 			cpu.call(0x77);
 
+			cpu.setC(0x23);
 			cpu.call(0xf2);
 
 			THEN("c == 0x89") {
@@ -328,7 +329,7 @@ SCENARIO("Testing OffsetRef", "[cpu]") {
 
 SCENARIO("Testing instructions", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::array<BYTE, 1024> data = {{ 0 }};
+		std::array<BYTE, 0x10000> data = {{ 0 }};
 		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
@@ -748,7 +749,7 @@ BYTE dec2bcd(BYTE in) {
 
 SCENARIO("Testing DAA instruction", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::array<BYTE, 1024> data = {{ 0 }};
+		std::array<BYTE, 0x10000> data = {{ 0 }};
 		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
@@ -925,7 +926,7 @@ SCENARIO("Testing DAA instruction", "[cpu]") {
 
 SCENARIO("Testing extended instructions", "[cpu]") {
 	GIVEN("CPU-derivative") {
-		std::array<BYTE, 1024> data = {{ 0 }};
+		std::array<BYTE, 0x10000> data = {{ 0 }};
 		TestMMU mmu{data};
 		TestCPU cpu{mmu};
 
