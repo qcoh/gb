@@ -1181,5 +1181,16 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 				REQUIRE(data[0xfffd] == 0x34);
 			}
 		}
+		WHEN("popping") {
+			data[0] = 0x34;
+			data[1] = 0x12;
+			cpu.setSP(0);
+			cpu.call(0xc1);
+
+			THEN("bc == 0x1234, sp == 0x2") {
+				REQUIRE(cpu.getBC() == 0x1234);
+				REQUIRE(cpu.getSP() == 2);
+			}
+		}
 	}
 }

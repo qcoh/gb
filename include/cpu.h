@@ -62,6 +62,8 @@ class CPU {
 			hl--;
 		}
 
+		void POP(WORD&);
+
 		// controlflow
 		void JR(const bool&, const BYTE&);
 		void JRn(const bool&, const BYTE&);

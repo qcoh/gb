@@ -239,7 +239,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xbf, std::bind(&CPU::CP,		this, std::cref(a)),			"CP A, A",	4, 1 },
 		
 		{}, // 0xc0
-		{}, // 0xc1
+		{ 0xc1, std::bind(&CPU::POP,		this, std::ref(bc)),			"POP BC",	12, 1 },
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
 		{}, // 0xc4
@@ -256,7 +256,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xcf
 		
 		{}, // 0xd0
-		{}, // 0xd1
+		{ 0xd1, std::bind(&CPU::POP,		this, std::ref(de)),			"POP DE",	12, 1 },
 		{ 0xd2, std::bind(&CPU::JPn,		this, carryFlag, std::cref(nn)),	"JP NC, nn",	0, 3 },
 		{}, // 0xd3
 		{}, // 0xd4
@@ -273,7 +273,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xdf
 		
 		{ 0xe0, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{n, mmu}, std::cref(a)), "LD (N+0xff00), A", 12, 2 },
-		{}, // 0xe1
+		{ 0xe1, std::bind(&CPU::POP,		this, std::ref(hl)),			"POP HL",	12, 1 },
 		{ 0xe2, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{c, mmu}, std::cref(a)), "LD (C+0xff00), A", 8, 1 },
 		{}, // 0xe3
 		{}, // 0xe4
@@ -290,7 +290,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xef
 
 		{ 0xf0, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(a), OffsetRef<0xff00>{n, mmu}), "LD A, (N+0xff00)", 12, 2 },
-		{}, // 0xf1
+		{ 0xf1, std::bind(&CPU::POP,		this, std::ref(af)),			"POP AF",	12, 1 },
 		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 8, 1 },
 		{}, // 0xf3
 		{}, // 0xf4
@@ -862,4 +862,9 @@ void CPU::CALL(const WORD& addr) {
 	mmu.writeByte(sp-2, pc & 0xff);
 	sp -= 2;
 	pc = addr;
+}
+
+void CPU::POP(WORD& reg) {
+	reg = static_cast<WORD>(mmu.readByte(sp) + (mmu.readByte(sp+1) << 8));
+	sp += 2;
 }
