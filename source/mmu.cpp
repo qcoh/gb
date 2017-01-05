@@ -22,6 +22,7 @@ std::array<BYTE, 256> MMU::bios{{
 
 MMU::MMU(std::unique_ptr<Mapper>&& mapper_) : 
 	mapper{std::move(mapper_)},
+	vram{{0}},
 	biosMode{true}
 {
 }
@@ -36,7 +37,7 @@ BYTE MMU::readByte(WORD addr) {
 		}
 	} else if (0x8000 <= addr && addr <= 0x9fff) {
 		// Video RAM
-		throw std::runtime_error{"Read from VRAM"};
+		return vram[addr - 0x8000];
 	} else if (0xa000 <= addr && addr <= 0xbfff) {
 		// Cartridge RAM
 		throw std::runtime_error{"Read from CartRAM"};
@@ -74,7 +75,7 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		mapper->writeByte(addr, v);
 	} else if (0x8000 <= addr && addr <= 0x9fff) {
 		// Video RAM
-		throw std::runtime_error{"Write to VRAM"};
+		vram[addr - 0x8000] = v;
 	} else if (0xa000 <= addr && addr <= 0xbfff) {
 		// Cartridge RAM
 		throw std::runtime_error{"Write to CartRAM"};
