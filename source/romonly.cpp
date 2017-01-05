@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "romonly.h"
 
 RomOnly::RomOnly(std::vector<BYTE>&& rom_) : Mapper{std::move(rom_)} {
@@ -12,4 +13,5 @@ void RomOnly::writeByte(WORD addr, BYTE v) {
 	(void)v;
 
 	// TODO: memory bank controller
+	throw std::runtime_error{"MBC not implemented"};
 }
