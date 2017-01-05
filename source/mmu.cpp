@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "mmu.h"
 
 std::array<BYTE, 256> MMU::bios{{
@@ -26,19 +27,80 @@ MMU::MMU(std::unique_ptr<Mapper>&& mapper_) :
 }
 
 BYTE MMU::readByte(WORD addr) {
-	if (addr < 0x2000) {
+	if (addr <= 0x7fff) {
+		// ROM and BIOS
 		if (biosMode && addr < 0x100) {
 			return bios[addr];
 		} else {
 			return mapper->readByte(addr);
 		}
+	} else if (0x8000 <= addr && addr <= 0x9fff) {
+		// Video RAM
+		throw std::runtime_error{"Read from VRAM"};
+	} else if (0xa000 <= addr && addr <= 0xbfff) {
+		// Cartridge RAM
+		throw std::runtime_error{"Read from CartRAM"};
+	} else if (0xc000 <= addr && addr <= 0xcfff) {
+		// Work RAM (0)
+		throw std::runtime_error{"Read from WRAM (0)"};
+	} else if (0xd000 <= addr && addr <= 0xdfff) {
+		// Work RAM (1)
+		throw std::runtime_error{"Read from WRAM (1)"};
+	} else if (0xe000 <= addr && addr <= 0xfdff) {
+		// Echo RAM
+		throw std::runtime_error{"Read from ERAM"};
+	} else if (0xfe00 <= addr && addr <= 0xfe9f) {
+		// Object Attribute Memory
+		throw std::runtime_error{"Read from OAM"};
+	} else if (0xfea0 <= addr && addr <= 0xfeff) {
+		// Not usable
+		throw std::runtime_error{"Read from unusable memory"};
+	} else if (0xff00 <= addr && addr <= 0xff7f) {
+		// IO registers
+		throw std::runtime_error{"Read from IO registers"};
+	} else if (0xff80 <= addr && addr <= 0xfffe) {
+		// High RAM
+		throw std::runtime_error{"Read from HRAM"};
+	} else /* 0xffff */ {
+		// Interrupt enable
+		throw std::runtime_error{"Read from interrupt-enable register"};
 	}
 	// TODO:
-	return mapper->readByte(addr);
+	//return mapper->readByte(addr);
 }
 
 void MMU::writeByte(WORD addr, BYTE v) {
-	// TODO
-	(void)addr;
-	(void)v;
+	if (addr <= 0x7fff) {
+		mapper->writeByte(addr, v);
+	} else if (0x8000 <= addr && addr <= 0x9fff) {
+		// Video RAM
+		throw std::runtime_error{"Write to VRAM"};
+	} else if (0xa000 <= addr && addr <= 0xbfff) {
+		// Cartridge RAM
+		throw std::runtime_error{"Write to CartRAM"};
+	} else if (0xc000 <= addr && addr <= 0xcfff) {
+		// Work RAM (0)
+		throw std::runtime_error{"Write to WRAM (0)"};
+	} else if (0xd000 <= addr && addr <= 0xdfff) {
+		// Work RAM (1)
+		throw std::runtime_error{"Write to WRAM (1)"};
+	} else if (0xe000 <= addr && addr <= 0xfdff) {
+		// Echo RAM
+		throw std::runtime_error{"Write to ERAM"};
+	} else if (0xfe00 <= addr && addr <= 0xfe9f) {
+		// Object Attribute Memory
+		throw std::runtime_error{"Write to OAM"};
+	} else if (0xfea0 <= addr && addr <= 0xfeff) {
+		// Not usable
+		throw std::runtime_error{"Write to unusable memory"};
+	} else if (0xff00 <= addr && addr <= 0xff7f) {
+		// IO registers
+		throw std::runtime_error{"Write to IO registers"};
+	} else if (0xff80 <= addr && addr <= 0xfffe) {
+		// High RAM
+		throw std::runtime_error{"Write to HRAM"};
+	} else /* 0xffff */ {
+		// Interrupt enable
+		throw std::runtime_error{"Write to interrupt-enable register"};
+	}
 }
