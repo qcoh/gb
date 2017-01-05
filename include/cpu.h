@@ -63,6 +63,7 @@ class CPU {
 		}
 
 		void POP(WORD&);
+		void PUSH(const WORD&);
 
 		// controlflow
 		void JR(const bool&, const BYTE&);

@@ -243,7 +243,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 3 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 3 },
 		{}, // 0xc4
-		{}, // 0xc5
+		{ 0xc5, std::bind(&CPU::PUSH,		this, std::cref(bc)),			"PUSH BC",	16, 1 },
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 2 },
 		{}, // 0xc7
 		{}, // 0xc8
@@ -260,7 +260,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xd2, std::bind(&CPU::JPn,		this, carryFlag, std::cref(nn)),	"JP NC, nn",	0, 3 },
 		{}, // 0xd3
 		{}, // 0xd4
-		{}, // 0xd5
+		{ 0xd5, std::bind(&CPU::PUSH,		this, std::cref(de)),			"PUSH DE",	16, 1 },
 		{ 0xd6, std::bind(&CPU::SUB,		this, std::cref(n)),			"SUB A, n",	8, 2 },
 		{}, // 0xd7
 		{}, // 0xd8
@@ -277,7 +277,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xe2, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{c, mmu}, std::cref(a)), "LD (C+0xff00), A", 8, 1 },
 		{}, // 0xe3
 		{}, // 0xe4
-		{}, // 0xe5
+		{ 0xe5, std::bind(&CPU::PUSH,		this, std::cref(hl)),			"PUSH HL",	16, 1 },
 		{ 0xe6, std::bind(&CPU::AND,		this, std::cref(n)),			"AND A, n",	8, 2 },
 		{}, // 0xe7
 		{}, // 0xe8
@@ -294,7 +294,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 8, 1 },
 		{}, // 0xf3
 		{}, // 0xf4
-		{}, // 0xf5
+		{ 0xf5, std::bind(&CPU::PUSH,		this, std::cref(af)),			"PUSH AF",	16, 1 },
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 2 },
 		{}, // 0xf7
 		{}, // 0xf8
@@ -333,7 +333,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x15, std::bind(&CPU::RL<BYTE>, this, std::ref(l)),		"RL L", 8, 0 },
 		{ 0x16, std::bind(&CPU::RL<MemRef>, this, MemRef{hl, mmu}),	"RL (HL)", 16, 0 },
 		{ 0x17, std::bind(&CPU::RL<BYTE>, this, std::ref(a)),		"RL A", 8, 0 },
-
 		{ 0x18, std::bind(&CPU::RR<BYTE>, this, std::ref(b)),		"RR B", 8, 0 },
 		{ 0x19, std::bind(&CPU::RR<BYTE>, this, std::ref(c)),		"RR C", 8, 0 },
 		{ 0x1a, std::bind(&CPU::RR<BYTE>, this, std::ref(d)),		"RR D", 8, 0 },
@@ -351,7 +350,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x25, std::bind(&CPU::SLA<BYTE>, this, std::ref(l)),		"SLA L", 8, 0 },
 		{ 0x26, std::bind(&CPU::SLA<MemRef>, this, MemRef{hl, mmu}),	"SLA (HL)", 16, 0 },
 		{ 0x27, std::bind(&CPU::SLA<BYTE>, this, std::ref(a)),		"SLA A", 8, 0 },
-
 		{ 0x28, std::bind(&CPU::SRA<BYTE>, this, std::ref(b)),		"SRA B", 8, 0 },
 		{ 0x29, std::bind(&CPU::SRA<BYTE>, this, std::ref(c)),		"SRA C", 8, 0 },
 		{ 0x2a, std::bind(&CPU::SRA<BYTE>, this, std::ref(d)),		"SRA D", 8, 0 },
@@ -369,7 +367,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x35, std::bind(&CPU::SWAP<BYTE>, this, std::ref(l)),		"SWAP L", 8, 0 },
 		{ 0x36, std::bind(&CPU::SWAP<MemRef>, this, MemRef{hl, mmu}),	"SWAP (HL)", 16, 0 },
 		{ 0x37, std::bind(&CPU::SWAP<BYTE>, this, std::ref(a)),		"SWAP A", 8, 0 },
-
 		{ 0x38, std::bind(&CPU::SRL<BYTE>, this, std::ref(b)),		"SRL B", 8, 0 },
 		{ 0x39, std::bind(&CPU::SRL<BYTE>, this, std::ref(c)),		"SRL C", 8, 0 },
 		{ 0x3a, std::bind(&CPU::SRL<BYTE>, this, std::ref(d)),		"SRL D", 8, 0 },
@@ -387,7 +384,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x45, std::bind(&CPU::BIT<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{l}), "BIT 0, L", 8, 0 },
 		{ 0x46, std::bind(&CPU::BIT<BitRef<MemRef, 0>>, this, BitRef<MemRef, 0>{MemRef{hl, mmu}}), "BIT 0, (HL)", 16, 0 },
 		{ 0x47, std::bind(&CPU::BIT<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{a}), "BIT 0, A", 8, 0 },
-
 		{ 0x48, std::bind(&CPU::BIT<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{b}), "BIT 1, B", 8, 0 },
 		{ 0x49, std::bind(&CPU::BIT<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{c}), "BIT 1, C", 8, 0 },
 		{ 0x4a, std::bind(&CPU::BIT<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{d}), "BIT 1, D", 8, 0 },
@@ -405,7 +401,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x55, std::bind(&CPU::BIT<BitRef<BYTE, 2>>, this, BitRef<BYTE, 2>{l}), "BIT 2, L", 8, 0 },
 		{ 0x56, std::bind(&CPU::BIT<BitRef<MemRef, 2>>, this, BitRef<MemRef, 2>{MemRef{hl, mmu}}), "BIT 2, (HL)", 16, 0 },
 		{ 0x57, std::bind(&CPU::BIT<BitRef<BYTE, 2>>, this, BitRef<BYTE, 2>{a}), "BIT 2, A", 8, 0 },
-
 		{ 0x58, std::bind(&CPU::BIT<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{b}), "BIT 3, B", 8, 0 },
 		{ 0x59, std::bind(&CPU::BIT<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{c}), "BIT 3, C", 8, 0 },
 		{ 0x5a, std::bind(&CPU::BIT<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{d}), "BIT 3, D", 8, 0 },
@@ -423,7 +418,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x65, std::bind(&CPU::BIT<BitRef<BYTE, 4>>, this, BitRef<BYTE, 4>{l}), "BIT 4, L", 8, 0 },
 		{ 0x66, std::bind(&CPU::BIT<BitRef<MemRef, 4>>, this, BitRef<MemRef, 4>{MemRef{hl, mmu}}), "BIT 4, (HL)", 16, 0 },
 		{ 0x67, std::bind(&CPU::BIT<BitRef<BYTE, 4>>, this, BitRef<BYTE, 4>{a}), "BIT 4, A", 8, 0 },
-
 		{ 0x68, std::bind(&CPU::BIT<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{b}), "BIT 5, B", 8, 0 },
 		{ 0x69, std::bind(&CPU::BIT<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{c}), "BIT 5, C", 8, 0 },
 		{ 0x6a, std::bind(&CPU::BIT<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{d}), "BIT 5, D", 8, 0 },
@@ -441,7 +435,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x75, std::bind(&CPU::BIT<BitRef<BYTE, 6>>, this, BitRef<BYTE, 6>{l}), "BIT 6, L", 8, 0 },
 		{ 0x76, std::bind(&CPU::BIT<BitRef<MemRef, 6>>, this, BitRef<MemRef, 6>{MemRef{hl, mmu}}), "BIT 6, (HL)", 16, 0 },
 		{ 0x77, std::bind(&CPU::BIT<BitRef<BYTE, 6>>, this, BitRef<BYTE, 6>{a}), "BIT 6, A", 8, 0 },
-
 		{ 0x78, std::bind(&CPU::BIT<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{b}), "BIT 7, B", 8, 0 },
 		{ 0x79, std::bind(&CPU::BIT<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{c}), "BIT 7, C", 8, 0 },
 		{ 0x7a, std::bind(&CPU::BIT<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{d}), "BIT 7, D", 8, 0 },
@@ -459,7 +452,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x85, std::bind(&CPU::RES<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{l}), "RES 0, L", 8, 0 },
 		{ 0x86, std::bind(&CPU::RES<BitRef<MemRef, 0>>, this, BitRef<MemRef, 0>{MemRef{hl, mmu}}), "RES 0, (HL)", 16, 0 },
 		{ 0x87, std::bind(&CPU::RES<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{a}), "RES 0, A", 8, 0 },
-
 		{ 0x88, std::bind(&CPU::RES<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{b}), "RES 1, B", 8, 0 },
 		{ 0x89, std::bind(&CPU::RES<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{c}), "RES 1, C", 8, 0 },
 		{ 0x8a, std::bind(&CPU::RES<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{d}), "RES 1, D", 8, 0 },
@@ -477,7 +469,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x95, std::bind(&CPU::RES<BitRef<BYTE, 2>>, this, BitRef<BYTE, 2>{l}), "RES 2, L", 8, 0 },
 		{ 0x96, std::bind(&CPU::RES<BitRef<MemRef, 2>>, this, BitRef<MemRef, 2>{MemRef{hl, mmu}}), "RES 2, (HL)", 16, 0 },
 		{ 0x97, std::bind(&CPU::RES<BitRef<BYTE, 2>>, this, BitRef<BYTE, 2>{a}), "RES 2, A", 8, 0 },
-
 		{ 0x98, std::bind(&CPU::RES<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{b}), "RES 3, B", 8, 0 },
 		{ 0x99, std::bind(&CPU::RES<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{c}), "RES 3, C", 8, 0 },
 		{ 0x9a, std::bind(&CPU::RES<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{d}), "RES 3, D", 8, 0 },
@@ -495,7 +486,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xa5, std::bind(&CPU::RES<BitRef<BYTE, 4>>, this, BitRef<BYTE, 4>{l}), "RES 4, L", 8, 0 },
 		{ 0xa6, std::bind(&CPU::RES<BitRef<MemRef, 4>>, this, BitRef<MemRef, 4>{MemRef{hl, mmu}}), "RES 4, (HL)", 16, 0 },
 		{ 0xa7, std::bind(&CPU::RES<BitRef<BYTE, 4>>, this, BitRef<BYTE, 4>{a}), "RES 4, A", 8, 0 },
-
 		{ 0xa8, std::bind(&CPU::RES<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{b}), "RES 5, B", 8, 0 },
 		{ 0xa9, std::bind(&CPU::RES<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{c}), "RES 5, C", 8, 0 },
 		{ 0xaa, std::bind(&CPU::RES<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{d}), "RES 5, D", 8, 0 },
@@ -513,7 +503,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xb5, std::bind(&CPU::RES<BitRef<BYTE, 6>>, this, BitRef<BYTE, 6>{l}), "RES 6, L", 8, 0 },
 		{ 0xb6, std::bind(&CPU::RES<BitRef<MemRef, 6>>, this, BitRef<MemRef, 6>{MemRef{hl, mmu}}), "RES 6, (HL)", 16, 0 },
 		{ 0xb7, std::bind(&CPU::RES<BitRef<BYTE, 6>>, this, BitRef<BYTE, 6>{a}), "RES 6, A", 8, 0 },
-
 		{ 0xb8, std::bind(&CPU::RES<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{b}), "RES 7, B", 8, 0 },
 		{ 0xb9, std::bind(&CPU::RES<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{c}), "RES 7, C", 8, 0 },
 		{ 0xba, std::bind(&CPU::RES<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{d}), "RES 7, D", 8, 0 },
@@ -523,7 +512,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xbe, std::bind(&CPU::RES<BitRef<MemRef, 7>>, this, BitRef<MemRef, 7>{MemRef{hl, mmu}}), "RES 7, (HL)", 16, 0 },
 		{ 0xbf, std::bind(&CPU::RES<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{a}), "RES 7, A", 8, 0 },
 
-
 		{ 0xc0, std::bind(&CPU::SET<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{b}), "SET 0, B", 8, 0 },
 		{ 0xc1, std::bind(&CPU::SET<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{c}), "SET 0, C", 8, 0 },
 		{ 0xc2, std::bind(&CPU::SET<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{d}), "SET 0, D", 8, 0 },
@@ -532,7 +520,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xc5, std::bind(&CPU::SET<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{l}), "SET 0, L", 8, 0 },
 		{ 0xc6, std::bind(&CPU::SET<BitRef<MemRef, 0>>, this, BitRef<MemRef, 0>{MemRef{hl, mmu}}), "SET 0, (HL)", 16, 0 },
 		{ 0xc7, std::bind(&CPU::SET<BitRef<BYTE, 0>>, this, BitRef<BYTE, 0>{a}), "SET 0, A", 8, 0 },
-
 		{ 0xc8, std::bind(&CPU::SET<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{b}), "SET 1, B", 8, 0 },
 		{ 0xc9, std::bind(&CPU::SET<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{c}), "SET 1, C", 8, 0 },
 		{ 0xca, std::bind(&CPU::SET<BitRef<BYTE, 1>>, this, BitRef<BYTE, 1>{d}), "SET 1, D", 8, 0 },
@@ -550,7 +537,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xd5, std::bind(&CPU::SET<BitRef<BYTE, 2>>, this, BitRef<BYTE, 2>{l}), "SET 2, L", 8, 0 },
 		{ 0xd6, std::bind(&CPU::SET<BitRef<MemRef, 2>>, this, BitRef<MemRef, 2>{MemRef{hl, mmu}}), "SET 2, (HL)", 16, 0 },
 		{ 0xd7, std::bind(&CPU::SET<BitRef<BYTE, 2>>, this, BitRef<BYTE, 2>{a}), "SET 2, A", 8, 0 },
-
 		{ 0xd8, std::bind(&CPU::SET<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{b}), "SET 3, B", 8, 0 },
 		{ 0xd9, std::bind(&CPU::SET<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{c}), "SET 3, C", 8, 0 },
 		{ 0xda, std::bind(&CPU::SET<BitRef<BYTE, 3>>, this, BitRef<BYTE, 3>{d}), "SET 3, D", 8, 0 },
@@ -568,7 +554,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xe5, std::bind(&CPU::SET<BitRef<BYTE, 4>>, this, BitRef<BYTE, 4>{l}), "SET 4, L", 8, 0 },
 		{ 0xe6, std::bind(&CPU::SET<BitRef<MemRef, 4>>, this, BitRef<MemRef, 4>{MemRef{hl, mmu}}), "SET 4, (HL)", 16, 0 },
 		{ 0xe7, std::bind(&CPU::SET<BitRef<BYTE, 4>>, this, BitRef<BYTE, 4>{a}), "SET 4, A", 8, 0 },
-
 		{ 0xe8, std::bind(&CPU::SET<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{b}), "SET 5, B", 8, 0 },
 		{ 0xe9, std::bind(&CPU::SET<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{c}), "SET 5, C", 8, 0 },
 		{ 0xea, std::bind(&CPU::SET<BitRef<BYTE, 5>>, this, BitRef<BYTE, 5>{d}), "SET 5, D", 8, 0 },
@@ -586,7 +571,6 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xf5, std::bind(&CPU::SET<BitRef<BYTE, 6>>, this, BitRef<BYTE, 6>{l}), "SET 6, L", 8, 0 },
 		{ 0xf6, std::bind(&CPU::SET<BitRef<MemRef, 6>>, this, BitRef<MemRef, 6>{MemRef{hl, mmu}}), "SET 6, (HL)", 16, 0 },
 		{ 0xf7, std::bind(&CPU::SET<BitRef<BYTE, 6>>, this, BitRef<BYTE, 6>{a}), "SET 6, A", 8, 0 },
-
 		{ 0xf8, std::bind(&CPU::SET<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{b}), "SET 7, B", 8, 0 },
 		{ 0xf9, std::bind(&CPU::SET<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{c}), "SET 7, C", 8, 0 },
 		{ 0xfa, std::bind(&CPU::SET<BitRef<BYTE, 7>>, this, BitRef<BYTE, 7>{d}), "SET 7, D", 8, 0 },
@@ -867,4 +851,10 @@ void CPU::CALL(const WORD& addr) {
 void CPU::POP(WORD& reg) {
 	reg = static_cast<WORD>(mmu.readByte(sp) + (mmu.readByte(sp+1) << 8));
 	sp += 2;
+}
+
+void CPU::PUSH(const WORD& reg) {
+	mmu.writeByte(sp-1, static_cast<BYTE>(reg >> 8));
+	mmu.writeByte(sp-2, static_cast<BYTE>(reg));
+	sp -= 2;
 }

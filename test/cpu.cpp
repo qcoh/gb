@@ -957,6 +957,27 @@ SCENARIO("Testing DAA instruction", "[cpu]") {
 				REQUIRE(cpu.getCarry() == true);
 			}
 		}
+		WHEN("popping") {
+			data[0] = 0x34;
+			data[1] = 0x12;
+			cpu.setSP(0);
+			cpu.call(0xc1);
+
+			THEN("bc == 0x1234, sp == 0x2") {
+				REQUIRE(cpu.getBC() == 0x1234);
+				REQUIRE(cpu.getSP() == 2);
+			}
+		}
+		WHEN("pushing") {
+			cpu.setSP(0xffff);
+			cpu.setBC(0x5678);
+			cpu.call(0xc5);
+
+			THEN("(0xfffe) == 0x56, (0xfffd) == 0x78") {
+				REQUIRE(data[0xfffe] == 0x56);
+				REQUIRE(data[0xfffd] == 0x78);
+			}
+		}
 	}
 }
 
@@ -1179,17 +1200,6 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 				REQUIRE(cpu.getSP() == 0xfffd);
 				REQUIRE(data[0xfffe] == 0x12);
 				REQUIRE(data[0xfffd] == 0x34);
-			}
-		}
-		WHEN("popping") {
-			data[0] = 0x34;
-			data[1] = 0x12;
-			cpu.setSP(0);
-			cpu.call(0xc1);
-
-			THEN("bc == 0x1234, sp == 0x2") {
-				REQUIRE(cpu.getBC() == 0x1234);
-				REQUIRE(cpu.getSP() == 2);
 			}
 		}
 	}
