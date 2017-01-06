@@ -23,7 +23,9 @@ std::array<BYTE, 256> MMU::bios{{
 MMU::MMU(std::unique_ptr<Mapper>&& mapper_) : 
 	mapper{std::move(mapper_)},
 	vram{{0}},
-	biosMode{true}
+	biosMode{true},
+	interruptFlag{0},
+	interruptEnable{0}
 {
 }
 
@@ -57,14 +59,16 @@ BYTE MMU::readByte(WORD addr) {
 		// Not usable
 		throw std::runtime_error{"Read from unusable memory"};
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
+		if (addr == 0xff0f) {
+			return interruptFlag;
+		}
 		// IO registers
 		throw std::runtime_error{"Read from IO registers"};
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
 		throw std::runtime_error{"Read from HRAM"};
 	} else /* 0xffff */ {
-		// Interrupt enable
-		throw std::runtime_error{"Read from interrupt-enable register"};
+		return interruptEnable;
 	}
 	// TODO:
 	//return mapper->readByte(addr);
@@ -96,12 +100,15 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		throw std::runtime_error{"Write to unusable memory"};
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
+		if (addr == 0xff0f) {
+			interruptFlag = v;
+			return;
+		}
 		throw std::runtime_error{"Write to IO registers"};
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
 		throw std::runtime_error{"Write to HRAM"};
 	} else /* 0xffff */ {
-		// Interrupt enable
-		throw std::runtime_error{"Write to interrupt-enable register"};
+		interruptEnable = v;
 	}
 }
