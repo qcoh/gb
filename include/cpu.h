@@ -41,6 +41,9 @@ class CPU {
 		BYTE n;
 		WORD nn;
 
+		// interrupt master enable flag
+		bool ime;
+
 		unsigned cycles;
 
 		std::array<Instruction, 256> instructions;
@@ -101,10 +104,12 @@ class CPU {
 		void RLA();
 		void RRA();
 
-		// extended instruction set
-
+		// misc
 		void CB();
+		void EI();
+		void DI();
 
+		// extended instruction set
 		template <typename T>
 		void RLC(T& target) {
 			carryFlag = ((target >> 7) != 0);

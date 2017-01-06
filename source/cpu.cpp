@@ -31,7 +31,8 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 	halfFlag{f},
 	carryFlag{f},
 	n{0},
-	nn{0}
+	nn{0},
+	ime{false}
 {
 	instructions = {{
 		{ 0x00, [](){}, "NOP", 4, 1 },
@@ -292,7 +293,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xf0, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(a), OffsetRef<0xff00>{n, mmu}), "LD A, (N+0xff00)", 12, 2 },
 		{ 0xf1, std::bind(&CPU::POP,		this, std::ref(af)),			"POP AF",	12, 1 },
 		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 8, 1 },
-		{}, // 0xf3
+		{ 0xf3, std::bind(&CPU::DI,		this),					"EI",		4, 1 },
 		{}, // 0xf4
 		{ 0xf5, std::bind(&CPU::PUSH,		this, std::cref(af)),			"PUSH AF",	16, 1 },
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 2 },
@@ -300,7 +301,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xf8
 		{}, // 0xf9
 		{}, // 0xfa
-		{}, // 0xfb
+		{ 0xfb, std::bind(&CPU::EI,		this),					"DI",		4, 1 },
 		{}, // 0xfc
 		{}, // 0xfd
 		{ 0xfe, std::bind(&CPU::CP,		this, std::cref(n)),			"CP A, n",	8, 2 },
@@ -857,4 +858,12 @@ void CPU::PUSH(const WORD& reg) {
 	mmu.writeByte(sp-1, static_cast<BYTE>(reg >> 8));
 	mmu.writeByte(sp-2, static_cast<BYTE>(reg));
 	sp -= 2;
+}
+
+void CPU::EI() {
+	ime = true;
+}
+
+void CPU::DI() {
+	ime = false;
 }
