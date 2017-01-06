@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
 		CPU cpu{mmu, true};
 
 		while (true) {
+			cpu.interrupt();
 			cpu.step();
 			//std::cin.get();
 		}

@@ -10,6 +10,7 @@ class CPU {
 		CPU(IMMU&, bool = false);
 
 		void step();
+		void interrupt();
 	protected:
 		bool debugMode;
 
