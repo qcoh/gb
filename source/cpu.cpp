@@ -32,7 +32,8 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 	carryFlag{f},
 	n{0},
 	nn{0},
-	ime{false}
+	ime{false},
+	cycles{0}
 {
 	instructions = {{
 		{ 0x00, [](){}, "NOP", 4, 1 },
@@ -583,7 +584,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 	}};
 }
 
-void CPU::step() {
+DWORD CPU::step() {
 	auto rb = mmu.readByte(pc);
 	auto& op = instructions[rb];
 	if (op.opcode != rb) {
@@ -609,8 +610,12 @@ void CPU::step() {
 		std::cout << "\n----\n\n";
 	}
 	op.f();
-	cycles += op.cycles;
+	// note: some instructions have variable length cycles. these instructions have op.cylces == 0 and set the correct values themselves.
+	if (op.cycles != 0) {
+		cycles = op.cycles;
+	}
 	pc += op.offset;
+	return cycles;
 }
 
 void CPU::interrupt() {

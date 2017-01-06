@@ -9,7 +9,7 @@ class CPU {
 	public:
 		CPU(IMMU&, bool = false);
 
-		void step();
+		DWORD step();
 		void interrupt();
 	protected:
 		bool debugMode;
@@ -45,7 +45,8 @@ class CPU {
 		// interrupt master enable flag
 		bool ime;
 
-		unsigned cycles;
+		// number of cycles of last instruction
+		DWORD cycles;
 
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;
