@@ -6,10 +6,11 @@
 #include "immu.h"
 #include "mapper.h"
 #include "types.h"
+#include "gpu.h"
 
 class MMU : public IMMU {
 	public:
-		MMU(std::unique_ptr<Mapper>&&);
+		MMU(std::unique_ptr<Mapper>&&, GPU&);
 
 		virtual BYTE readByte(WORD) override;
 		virtual void writeByte(WORD, BYTE) override;
@@ -19,8 +20,7 @@ class MMU : public IMMU {
 		std::unique_ptr<Mapper> mapper;
 		static std::array<BYTE, 256> bios;
 
-		// VRAM; 0x8000 to 0x9fff
-		std::array<BYTE, 0x2000> vram;
+		GPU& gpu;
 
 		bool biosMode;
 

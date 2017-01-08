@@ -20,9 +20,9 @@ std::array<BYTE, 256> MMU::bios{{
 	0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50,
 }};
 
-MMU::MMU(std::unique_ptr<Mapper>&& mapper_) : 
+MMU::MMU(std::unique_ptr<Mapper>&& mapper_, GPU& gpu_) : 
 	mapper{std::move(mapper_)},
-	vram{{0}},
+	gpu{gpu_},
 	biosMode{true},
 	interruptFlag{0},
 	interruptEnable{0}
@@ -39,7 +39,7 @@ BYTE MMU::readByte(WORD addr) {
 		}
 	} else if (0x8000 <= addr && addr <= 0x9fff) {
 		// Video RAM
-		return vram[addr - 0x8000];
+		return gpu.readByte(addr - 0x8000);
 	} else if (0xa000 <= addr && addr <= 0xbfff) {
 		// Cartridge RAM
 		throw std::runtime_error{"Read from CartRAM"};
@@ -79,7 +79,7 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		mapper->writeByte(addr, v);
 	} else if (0x8000 <= addr && addr <= 0x9fff) {
 		// Video RAM
-		vram[addr - 0x8000] = v;
+		gpu.writeByte(addr - 0x8000, v);
 	} else if (0xa000 <= addr && addr <= 0xbfff) {
 		// Cartridge RAM
 		throw std::runtime_error{"Write to CartRAM"};

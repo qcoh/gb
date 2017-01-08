@@ -12,7 +12,7 @@ std::ostream& operator<<(std::ostream& os, const GPU::Mode& mode) {
 	}
 }
 
-GPU::GPU() : cycleCount{0}, mode{Mode::HBlank}, line{0} {
+GPU::GPU() : cycleCount{0}, mode{Mode::HBlank}, line{0}, vram{{0}} {
 }
 
 // See: http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-GPU-Timings
@@ -63,4 +63,12 @@ void GPU::step(DWORD cycles) {
 		}
 		break;
 	}
+}
+
+void GPU::writeByte(WORD addr, BYTE v) {
+	vram[addr] = v;
+}
+
+BYTE GPU::readByte(WORD addr) {
+	return vram[addr];
 }

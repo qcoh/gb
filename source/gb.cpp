@@ -10,10 +10,10 @@
 int main(int argc, char *argv[]) {
 	(void)argc;
 	try {
-		auto mapper = Mapper::fromFile(argv[1]);
-		MMU mmu{std::move(mapper)};
-		CPU cpu{mmu, true};
 		GPU gpu{};
+		auto mapper = Mapper::fromFile(argv[1]);
+		MMU mmu{std::move(mapper), gpu};
+		CPU cpu{mmu, true};
 
 		while (true) {
 			cpu.interrupt();
