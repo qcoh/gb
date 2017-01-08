@@ -59,11 +59,15 @@ BYTE MMU::readByte(WORD addr) {
 		// Not usable
 		throw std::runtime_error{"Read from unusable memory"};
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
-		if (addr == 0xff0f) {
-			return interruptFlag;
-		}
 		// IO registers
-		throw std::runtime_error{"Read from IO registers"};
+		switch (addr) {
+		case 0xff0f:
+			return interruptFlag;
+		case 0xff40:
+			return gpu.lcdControl();
+		default:
+			throw std::runtime_error{"Read from IO registers"};
+		}
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
 		throw std::runtime_error{"Read from HRAM"};
@@ -100,11 +104,16 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		throw std::runtime_error{"Write to unusable memory"};
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
-		if (addr == 0xff0f) {
+		switch (addr) {
+		case 0xff0f:
 			interruptFlag = v;
 			return;
+		case 0xff40:
+			gpu.lcdControl() = v;
+			return;
+		default:
+			throw std::runtime_error{"Write to IO registers"};
 		}
-		throw std::runtime_error{"Write to IO registers"};
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
 		throw std::runtime_error{"Write to HRAM"};
