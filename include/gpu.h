@@ -12,6 +12,8 @@ class GPU {
 		BYTE readByte(WORD);
 
 		BYTE& lcdControl();
+		BYTE& scrollX();
+		BYTE& scrollY();
 
 		enum class Mode {
 			AccessingOAM,
@@ -37,5 +39,7 @@ class GPU {
 		BitRef<BYTE, 1> objEnable;
 		BitRef<BYTE, 0> bgDisplay;
 
-
+		// Scroll registers
+		BYTE scX;
+		BYTE scY;
 };

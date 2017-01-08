@@ -25,7 +25,9 @@ GPU::GPU() :
 	bgTileSelect{lcdc},
 	objSize{lcdc},
 	objEnable{lcdc},
-	bgDisplay{lcdc}
+	bgDisplay{lcdc},
+	scX{0},
+	scY{0}
 {
 }
 
@@ -89,4 +91,12 @@ BYTE GPU::readByte(WORD addr) {
 
 BYTE& GPU::lcdControl() {
 	return lcdc;
+}
+
+BYTE& GPU::scrollX() {
+	return scX;
+}
+
+BYTE& GPU::scrollY() {
+	return scY;
 }

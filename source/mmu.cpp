@@ -65,6 +65,10 @@ BYTE MMU::readByte(WORD addr) {
 			return interruptFlag;
 		case 0xff40:
 			return gpu.lcdControl();
+		case 0xff42:
+			return gpu.scrollY();
+		case 0xff43:
+			return gpu.scrollX();
 		default:
 			throw std::runtime_error{"Read from IO registers"};
 		}
@@ -110,6 +114,12 @@ void MMU::writeByte(WORD addr, BYTE v) {
 			return;
 		case 0xff40:
 			gpu.lcdControl() = v;
+			return;
+		case 0xff42:
+			gpu.scrollY() = v;
+			return;
+		case 0xff43:
+			gpu.scrollX() = v;
 			return;
 		default:
 			throw std::runtime_error{"Write to IO registers"};
