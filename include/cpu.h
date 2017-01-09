@@ -77,6 +77,7 @@ class CPU {
 		void JPn(const bool&, const WORD&);
 
 		void CALL(const WORD&);
+		void RET();
 
 		// 8bit arithmetic
 		void INCb(BYTE&);

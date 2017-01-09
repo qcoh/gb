@@ -1199,5 +1199,17 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 				REQUIRE(data[0xfffd] == 0x34);
 			}
 		}
+		WHEN("Returning from function") {
+			cpu.setPC(0x9876);
+			cpu.setSP(0xffff);
+			cpu.setNN(0x1234);
+
+			cpu.call(0xcd);
+			cpu.call(0xc9);
+
+			THEN("pc == 0x9876") {
+				REQUIRE(cpu.getPC() == 0x9876);
+			}
+		}
 	}
 }

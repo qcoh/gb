@@ -249,7 +249,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 2 },
 		{}, // 0xc7
 		{}, // 0xc8
-		{}, // 0xc9
+		{ 0xc9, std::bind(&CPU::RET,		this),					"RET",		16, 0 },
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
 		{}, // 0xcc
@@ -886,4 +886,11 @@ void CPU::EI() {
 
 void CPU::DI() {
 	ime = false;
+}
+
+void CPU::RET() {
+	BYTE low = mmu.readByte(sp);
+	BYTE high = mmu.readByte(sp+1);
+	pc = static_cast<WORD>((high << 8) + low);
+	sp += 2;
 }
