@@ -82,21 +82,69 @@ void GPU::step(DWORD cycles) {
 }
 
 void GPU::writeByte(WORD addr, BYTE v) {
-	vram[addr] = v;
+	switch (addr & 0xf000) {
+	case 0x8000:
+	case 0x9000:
+		vram[addr - 0x8000] = v;
+		return;
+	case 0xf000:
+		switch (addr) {
+		case LCD_CONTROL:
+			lcdc = v;
+			return;
+		case LCD_STAT:
+		case LCD_SCY:
+			scY = v;
+			return;
+		case LCD_SCX:
+			scX = v;
+			return;
+		case LCD_LY:
+		case LCD_LYC:
+		case LCD_DMA:
+		case LCD_BGP:
+		case LCD_OBP0:
+		case LCD_OBP1:
+		case LCD_WY:
+		case LCD_WX:
+		default:
+			throw std::runtime_error{"LCD registers not implemented"};
+		}
+		return;
+	default:
+		std::cout << std::hex << +addr << '\n';
+		throw std::runtime_error{"Out of bounds"};
+	}
 }
 
 BYTE GPU::readByte(WORD addr) {
-	return vram[addr];
+	switch (addr & 0xf000) {
+	case 0x8000:
+	case 0x9000:
+		return vram[addr - 0x8000];
+	case 0xf000:
+		switch (addr) {
+		case LCD_CONTROL:
+			return lcdc;
+		case LCD_STAT:
+		case LCD_SCY:
+			return scY;
+		case LCD_SCX:
+			return scX;
+		case LCD_LY:
+		case LCD_LYC:
+		case LCD_DMA:
+		case LCD_BGP:
+		case LCD_OBP0:
+		case LCD_OBP1:
+		case LCD_WY:
+		case LCD_WX:
+		default:
+			break;
+		}
+		throw std::runtime_error{"LCD registers not implemented"};
+	default:
+		throw std::runtime_error{"Out of bounds"};
+	}
 }
 
-BYTE& GPU::lcdControl() {
-	return lcdc;
-}
-
-BYTE& GPU::scrollX() {
-	return scX;
-}
-
-BYTE& GPU::scrollY() {
-	return scY;
-}

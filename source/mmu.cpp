@@ -39,7 +39,7 @@ BYTE MMU::readByte(WORD addr) {
 		}
 	} else if (0x8000 <= addr && addr <= 0x9fff) {
 		// Video RAM
-		return gpu.readByte(addr - 0x8000);
+		return gpu.readByte(addr);
 	} else if (0xa000 <= addr && addr <= 0xbfff) {
 		// Cartridge RAM
 		throw std::runtime_error{"Read from CartRAM"};
@@ -64,11 +64,17 @@ BYTE MMU::readByte(WORD addr) {
 		case 0xff0f:
 			return interruptFlag;
 		case 0xff40:
-			return gpu.lcdControl();
 		case 0xff42:
-			return gpu.scrollY();
 		case 0xff43:
-			return gpu.scrollX();
+		case 0xff44:
+		case 0xff45:
+		case 0xff46:
+		case 0xff47:
+		case 0xff48:
+		case 0xff49:
+		case 0xff4a:
+		case 0xff4b:
+			return gpu.readByte(addr);
 		default:
 			throw std::runtime_error{"Read from IO registers"};
 		}
@@ -87,7 +93,7 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		mapper->writeByte(addr, v);
 	} else if (0x8000 <= addr && addr <= 0x9fff) {
 		// Video RAM
-		gpu.writeByte(addr - 0x8000, v);
+		gpu.writeByte(addr, v);
 	} else if (0xa000 <= addr && addr <= 0xbfff) {
 		// Cartridge RAM
 		throw std::runtime_error{"Write to CartRAM"};
@@ -113,13 +119,17 @@ void MMU::writeByte(WORD addr, BYTE v) {
 			interruptFlag = v;
 			return;
 		case 0xff40:
-			gpu.lcdControl() = v;
-			return;
 		case 0xff42:
-			gpu.scrollY() = v;
-			return;
 		case 0xff43:
-			gpu.scrollX() = v;
+		case 0xff44:
+		case 0xff45:
+		case 0xff46:
+		case 0xff47:
+		case 0xff48:
+		case 0xff49:
+		case 0xff4a:
+		case 0xff4b:
+			gpu.writeByte(addr, v);
 			return;
 		default:
 			throw std::runtime_error{"Write to IO registers"};
