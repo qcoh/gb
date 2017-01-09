@@ -25,7 +25,7 @@ $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-.PHONY: clean
+.PHONY: clean check
 
 test: $(TEST_OBJECTS) $(OBJECTS)
 	$(CC) $(TEST_OBJECTS) $(filter-out $(BUILD_DIR)/gb.o, $(OBJECTS)) $(LFLAGS) -o $(BUILD_DIR)/$@
@@ -35,5 +35,8 @@ $(BUILD_DIR)/%.test.o: $(TEST_DIR)/%.cpp
 
 clean:
 	rm -r $(BUILD_DIR)
+
+check:
+	cppcheck --enable=all --std=c++11 -I include/ -i test/ .
 
 -include $(DEPENDENCIES)
