@@ -13,9 +13,9 @@ std::ostream& operator<<(std::ostream& os, const GPU::Mode& mode) {
 }
 
 GPU::GPU() :
+	display{{0}},
 	cycleCount{0},
 	mode{Mode::HBlank},
-	line{0},
 	vram{{0}},
 	lcdControl{0},
 	lcdEnable{lcdControl},
@@ -38,6 +38,7 @@ GPU::GPU() :
 	wY{0},
 	wX{0}
 {
+	(void)display;
 	(void)lcdStat;
 	(void)lYC;
 	(void)dma;
@@ -73,9 +74,9 @@ void GPU::step(DWORD cycles) {
 	case Mode::HBlank:
 		if (cycleCount >= 204) {
 			cycleCount = 0;
-			line++;
+			lY++;
 
-			if (line == 143) {
+			if (lY == 143) {
 				mode = Mode::VBlank;
 				// draw to screen
 			} else {
@@ -86,11 +87,11 @@ void GPU::step(DWORD cycles) {
 	case Mode::VBlank:
 		if (cycleCount >= 456) {
 			cycleCount = 0;
-			line++;
+			lY++;
 
-			if (line > 153) {
+			if (lY > 153) {
 				mode = Mode::AccessingOAM;
-				line = 0;
+				lY = 0;
 			}
 		}
 		break;
@@ -109,6 +110,7 @@ void GPU::writeByte(WORD addr, BYTE v) {
 			lcdControl = v;
 			return;
 		case LCD_STAT:
+			break;
 		case LCD_SCY:
 			scY = v;
 			return;
@@ -118,15 +120,19 @@ void GPU::writeByte(WORD addr, BYTE v) {
 		case LCD_LY:
 		case LCD_LYC:
 		case LCD_DMA:
+			break;
 		case LCD_BGP:
+			bgp = v;
+			return;
 		case LCD_OBP0:
 		case LCD_OBP1:
 		case LCD_WY:
 		case LCD_WX:
 		default:
-			throw std::runtime_error{"LCD registers not implemented"};
+			break;
 		}
-		return;
+		std::cout << "LCD register: " << std::hex << +addr << '\n';
+		throw std::runtime_error{"LCD registers not implemented"};
 	default:
 		std::cout << std::hex << +addr << '\n';
 		throw std::runtime_error{"Out of bounds"};
@@ -143,6 +149,7 @@ BYTE GPU::readByte(WORD addr) {
 		case LCD_CONTROL:
 			return lcdControl;
 		case LCD_STAT:
+			break;
 		case LCD_SCY:
 			return scY;
 		case LCD_SCX:
@@ -150,7 +157,9 @@ BYTE GPU::readByte(WORD addr) {
 		case LCD_LY:
 		case LCD_LYC:
 		case LCD_DMA:
+			break;
 		case LCD_BGP:
+			return bgp;
 		case LCD_OBP0:
 		case LCD_OBP1:
 		case LCD_WY:
@@ -165,6 +174,9 @@ BYTE GPU::readByte(WORD addr) {
 }
 
 void GPU::renderScanline() {
+	if (bgDisplay) {
+		renderTiles();
+	}
 }
 
 void GPU::renderTiles() {
@@ -229,10 +241,19 @@ void GPU::renderTiles() {
 
 		// TODO: palette
 		BYTE pixelColor = static_cast<BYTE>((color & 0x1) * 85 + (color >> 1) * 170);
-		(void)pixelColor;
+		if (lY > 143 || pixel > 159) {
+			throw std::runtime_error{"overflowing image"};
+		}
 
-		// TODO: draw pixel
+		display[static_cast<DWORD>(pixel + 160 * lY)] = 0xff000000;
+		display[static_cast<DWORD>(pixel + 160 * lY)] |= static_cast<DWORD>(pixelColor | pixelColor << 8 | pixelColor << 16);
 	}
+
+	// printf debugging
+	for (unsigned i = 0; i < 160; i++) {
+		std::cout << std::hex << +display[160 * lY + i] << " ";
+	}
+	std::cout << '\n';
 }
 
 void GPU::renderSprites() {

@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 #include "mmu.h"
 
 std::array<BYTE, 256> MMU::bios{{
@@ -25,7 +26,8 @@ MMU::MMU(std::unique_ptr<Mapper>&& mapper_, GPU& gpu_) :
 	gpu{gpu_},
 	biosMode{true},
 	interruptFlag{0},
-	interruptEnable{0}
+	interruptEnable{0},
+	hram{{0}}
 {
 }
 
@@ -60,27 +62,24 @@ BYTE MMU::readByte(WORD addr) {
 		throw std::runtime_error{"Read from unusable memory"};
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
-		switch (addr) {
-		case 0xff0f:
+		if (addr == 0xff0f) {
 			return interruptFlag;
-		case 0xff40:
-		case 0xff42:
-		case 0xff43:
-		case 0xff44:
-		case 0xff45:
-		case 0xff46:
-		case 0xff47:
-		case 0xff48:
-		case 0xff49:
-		case 0xff4a:
-		case 0xff4b:
+		}
+		switch (addr & 0x00f0) {
+		case 0x0010:
+		case 0x0020:
+		case 0x0030:
+			// audio, ignore for now
+			return 0;
+		case 0x0040:
+			// video
 			return gpu.readByte(addr);
 		default:
 			throw std::runtime_error{"Read from IO registers"};
 		}
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
-		throw std::runtime_error{"Read from HRAM"};
+		return hram[addr - 0xff80];
 	} else /* 0xffff */ {
 		return interruptEnable;
 	}
@@ -114,29 +113,28 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		throw std::runtime_error{"Write to unusable memory"};
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
-		switch (addr) {
-		case 0xff0f:
+		if (addr == 0xff0f) {
 			interruptFlag = v;
 			return;
-		case 0xff40:
-		case 0xff42:
-		case 0xff43:
-		case 0xff44:
-		case 0xff45:
-		case 0xff46:
-		case 0xff47:
-		case 0xff48:
-		case 0xff49:
-		case 0xff4a:
-		case 0xff4b:
+		}
+		switch (addr & 0x00f0) {
+		case 0x0010:
+		case 0x0020:
+		case 0x0030:
+			// audio, ignore for now
+			return;
+		case 0x0040:
+			// video
 			gpu.writeByte(addr, v);
 			return;
 		default:
+			std::cout << "Write to " << std::hex << +addr << '\n';
 			throw std::runtime_error{"Write to IO registers"};
 		}
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
-		throw std::runtime_error{"Write to HRAM"};
+		hram[addr - 0xff80] = v;
+		return;
 	} else /* 0xffff */ {
 		interruptEnable = v;
 	}

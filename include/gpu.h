@@ -31,13 +31,16 @@ class GPU {
 		static const WORD LCD_WY = 0xff4a;
 		static const WORD LCD_WX = 0xff4b;
 	private:
+		static const int WIDTH = 160;
+		static const int HEIGHT = 144;
+		std::array<DWORD, WIDTH * HEIGHT> display;
+
 		void renderScanline();
 		void renderTiles();
 		void renderSprites();
 
 		DWORD cycleCount;
 		Mode mode;
-		BYTE line;
 
 		std::array<BYTE, 0x2000> vram;
 

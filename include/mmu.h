@@ -26,4 +26,6 @@ class MMU : public IMMU {
 
 		BYTE interruptFlag;
 		BYTE interruptEnable;
+
+		std::array<BYTE, 127> hram;
 };
