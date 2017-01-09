@@ -450,8 +450,7 @@ SCENARIO("Testing instructions", "[cpu]") {
 		WHEN("adcing to a") {
 			cpu.setA(0x0e);
 			cpu.setB(0xf0);
-			auto c = cpu.getCarry();
-			c = true;
+			cpu.getCarry() = true;
 			cpu.call(0x88);
 
 			THEN("a == 0xff") {
@@ -461,8 +460,7 @@ SCENARIO("Testing instructions", "[cpu]") {
 		WHEN("adcing with half-carry and carry") {
 			cpu.setA(0xff);
 			cpu.setB(0x00);
-			auto c = cpu.getCarry();
-			c = true;
+			cpu.getCarry() = true;
 			cpu.call(0x88);
 
 			THEN("a == 0x00, zeroFlag == true, halfFlag == true, carryFlag == true") {
@@ -500,8 +498,7 @@ SCENARIO("Testing instructions", "[cpu]") {
 		WHEN("sbcing with carry, halfcarry") {
 			cpu.setA(0x01);
 			cpu.setB(0x01);
-			auto c = cpu.getCarry();
-			c = true;
+			cpu.getCarry() = true;
 			cpu.call(0x98);
 
 			THEN("a == 0xff, carryFlag == true, halfFlag == true, zeroFlag == false") {
