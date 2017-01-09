@@ -17,18 +17,34 @@ GPU::GPU() :
 	mode{Mode::HBlank},
 	line{0},
 	vram{{0}},
-	lcdc{0},
-	lcdEnable{lcdc},
-	windowTileSelect{lcdc},
-	windowEnable{lcdc},
-	tileDataSelect{lcdc},
-	bgTileSelect{lcdc},
-	objSize{lcdc},
-	objEnable{lcdc},
-	bgDisplay{lcdc},
+	lcdControl{0},
+	lcdEnable{lcdControl},
+	windowTileSelect{lcdControl},
+	windowEnable{lcdControl},
+	tileDataSelect{lcdControl},
+	bgTileSelect{lcdControl},
+	objSize{lcdControl},
+	objEnable{lcdControl},
+	bgDisplay{lcdControl},
+	lcdStat{0},
+	scY{0},
 	scX{0},
-	scY{0}
+	lY{0},
+	lYC{0},
+	dma{0},
+	bgp{0},
+	obp0{0},
+	obp1{0},
+	wY{0},
+	wX{0}
 {
+	(void)lcdStat;
+	(void)lYC;
+	(void)dma;
+	(void)obp0;
+	(void)obp1;
+	(void)wX;
+	(void)bgp;
 }
 
 // See: http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-GPU-Timings
@@ -50,8 +66,8 @@ void GPU::step(DWORD cycles) {
 			cycleCount = 0;
 			mode = Mode::HBlank;
 
-			// TODO: scanline
-			throw std::runtime_error{"Scanline"};
+			//throw std::runtime_error{"Scanline"};
+			renderScanline();
 		}
 		break;
 	case Mode::HBlank:
@@ -90,7 +106,7 @@ void GPU::writeByte(WORD addr, BYTE v) {
 	case 0xf000:
 		switch (addr) {
 		case LCD_CONTROL:
-			lcdc = v;
+			lcdControl = v;
 			return;
 		case LCD_STAT:
 		case LCD_SCY:
@@ -125,7 +141,7 @@ BYTE GPU::readByte(WORD addr) {
 	case 0xf000:
 		switch (addr) {
 		case LCD_CONTROL:
-			return lcdc;
+			return lcdControl;
 		case LCD_STAT:
 		case LCD_SCY:
 			return scY;
@@ -148,3 +164,76 @@ BYTE GPU::readByte(WORD addr) {
 	}
 }
 
+void GPU::renderScanline() {
+}
+
+void GPU::renderTiles() {
+	// see: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
+	bool unsig = true;
+	bool useWindow = windowEnable && (wY <= lY);
+
+
+	WORD tileData = 0;
+	if (tileDataSelect) {
+		tileData = 0x8000;
+	} else {
+		tileData = 0x8800;
+		unsig = false;
+	}
+	
+	WORD bgMemory = 0;
+	if (useWindow) {
+		bgMemory = (bgTileSelect) ? 0x9c00 : 0x9800;
+	} else {
+		bgMemory = (windowTileSelect) ? 0x9c00 : 0x9800;
+	}
+
+	BYTE ypos = 0;
+	if (!useWindow) {
+		ypos = scY + lY;
+	} else {
+		ypos = lY - scY;
+	}
+
+	WORD tileRow = static_cast<WORD>(((ypos >> 3) & 0xff) << 5);
+
+	for (int pixel = 0; pixel < 160; pixel++) {
+		BYTE xpos = static_cast<BYTE>(pixel + scX);
+
+		if (useWindow) {
+			if (pixel >= wX) {
+				xpos = static_cast<BYTE>(pixel - wX);
+			}
+		}
+
+		WORD tileColumn = xpos >> 3;
+		WORD tileAddr = bgMemory + tileRow + tileColumn;
+		WORD tileLocation = tileData;
+		
+		int16_t tileNo = 0;
+
+		if (unsig) {
+			tileNo = readByte(tileAddr);
+			tileLocation += tileNo * 16;
+		} else {
+			tileNo = static_cast<int8_t>(readByte(tileAddr));
+			tileLocation += (tileNo + 128) * 16;
+		}
+
+		BYTE currentLine = static_cast<BYTE>((ypos & 0x7) << 1);
+		BYTE lineData0 = readByte(static_cast<WORD>(tileLocation + currentLine));
+		BYTE lineData1 = readByte(static_cast<WORD>(tileLocation + currentLine + 1));
+
+		int colorBit = ((xpos & 0x7) - 7) * (-1);
+		int color = (((lineData1 >> colorBit) << 1) & 0x2) | ((lineData0 >> colorBit) & 0x1);
+
+		// TODO: palette
+		BYTE pixelColor = static_cast<BYTE>((color & 0x1) * 85 + (color >> 1) * 170);
+		(void)pixelColor;
+
+		// TODO: draw pixel
+	}
+}
+
+void GPU::renderSprites() {
+}

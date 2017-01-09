@@ -31,14 +31,18 @@ class GPU {
 		static const WORD LCD_WY = 0xff4a;
 		static const WORD LCD_WX = 0xff4b;
 	private:
+		void renderScanline();
+		void renderTiles();
+		void renderSprites();
+
 		DWORD cycleCount;
 		Mode mode;
 		BYTE line;
 
 		std::array<BYTE, 0x2000> vram;
 
-		// LCD Control register
-		BYTE lcdc;
+		// 0xff40: LCD Control register
+		BYTE lcdControl;
 		BitRef<BYTE, 7> lcdEnable;
 		BitRef<BYTE, 6> windowTileSelect;
 		BitRef<BYTE, 5> windowEnable;
@@ -48,7 +52,36 @@ class GPU {
 		BitRef<BYTE, 1> objEnable;
 		BitRef<BYTE, 0> bgDisplay;
 
-		// Scroll registers
-		BYTE scX;
+		// 0xff41: LCD STAT
+		BYTE lcdStat;
+
+		// 0xff42: SCY Scroll Y
 		BYTE scY;
+
+		// 0xff43: SCX Scroll X
+		BYTE scX;
+
+		// 0xff44: LY current Y position
+		BYTE lY;
+
+		// 0xff45: LYC LY compare
+		BYTE lYC;
+
+		// 0xff46: DMA transfer
+		BYTE dma;
+
+		// 0xff47: BGP background palette data
+		BYTE bgp;
+
+		// 0xff48: OBP0 object palette 0 data
+		BYTE obp0;
+
+		// 0xff49: OBP1 object palette 1 data
+		BYTE obp1;
+
+		// 0xff4a: WY window Y position
+		BYTE wY;
+
+		// 0xff4b: WX window X position
+		BYTE wX;
 };
