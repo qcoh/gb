@@ -249,7 +249,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 2 },
 		{}, // 0xc7
 		{}, // 0xc8
-		{ 0xc9, std::bind(&CPU::RET,		this),					"RET",		16, 1 }, // offset == 1, infinite loop otherwise
+		{ 0xc9, std::bind(&CPU::RET,		this),					"RET",		16, 0 },
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 3 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 2 },
 		{}, // 0xcc
@@ -863,8 +863,9 @@ void CPU::DAA() {
 }
 
 void CPU::CALL(const WORD& addr) {
-	mmu.writeByte(sp-1, pc >> 8);
-	mmu.writeByte(sp-2, pc & 0xff);
+	WORD newpc = pc + 3;
+	mmu.writeByte(sp-1, newpc >> 8);
+	mmu.writeByte(sp-2, newpc & 0xff);
 	sp -= 2;
 	pc = addr;
 }
