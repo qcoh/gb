@@ -127,6 +127,11 @@ void MMU::writeByte(WORD addr, BYTE v) {
 			// video
 			gpu.writeByte(addr, v);
 			return;
+		case 0x0050:
+			if (addr == 0xff50) {
+				biosMode = false;
+				return;
+			}
 		default:
 			std::cout << "Write to " << std::hex << +addr << '\n';
 			throw std::runtime_error{"Write to IO registers"};
