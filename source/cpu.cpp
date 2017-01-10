@@ -284,7 +284,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xe7
 		{}, // 0xe8
 		{}, // 0xe9
-		{}, // 0xea
+		{ 0xea, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{nn, mmu}, std::cref(a)),	"LD (nn), A",	16, 3 },
 		{}, // 0xeb
 		{}, // 0xec
 		{}, // 0xed
@@ -301,7 +301,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xf7
 		{}, // 0xf8
 		{}, // 0xf9
-		{}, // 0xfa
+		{ 0xfa, std::bind(&CPU::LD<BYTE, MemRef>, this, std::ref(a), MemRef{nn, mmu}),	"LD A, (nn)",	16, 3 },
 		{ 0xfb, std::bind(&CPU::EI,		this),					"DI",		4, 1 },
 		{}, // 0xfc
 		{}, // 0xfd
