@@ -40,6 +40,7 @@ class GPU {
 		void renderScanline();
 		void renderTiles();
 		void renderSprites();
+		DWORD paletteColor(int);
 
 		DWORD cycleCount;
 		Mode mode;

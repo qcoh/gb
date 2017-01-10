@@ -244,14 +244,11 @@ void GPU::renderTiles() {
 		int colorBit = ((xpos & 0x7) - 7) * (-1);
 		int color = (((lineData1 >> colorBit) << 1) & 0x2) | ((lineData0 >> colorBit) & 0x1);
 
-		// TODO: palette
-		BYTE pixelColor = static_cast<BYTE>((color & 0x1) * 85 + (color >> 1) * 170);
 		if (lY > 143 || pixel > 159) {
 			throw std::runtime_error{"overflowing image"};
 		}
 
-		pixelArray[static_cast<DWORD>(pixel + 160 * lY)] = 0xff000000;
-		pixelArray[static_cast<DWORD>(pixel + 160 * lY)] |= static_cast<DWORD>(pixelColor | pixelColor << 8 | pixelColor << 16);
+		pixelArray[static_cast<DWORD>(pixel + 160 * lY)] = paletteColor(color);
 	}
 
 	// printf debugging
@@ -259,6 +256,16 @@ void GPU::renderTiles() {
 	//	std::cout << std::hex << +display[160 * lY + i] << " ";
 	//}
 	//std::cout << '\n';
+}
+
+DWORD GPU::paletteColor(int c) {
+	c *= 2;
+	switch ((bgp >> c) & 0x3) {
+	case 0: return 0xffffffff;
+	case 1: return 0xffc0c0c0;
+	case 2: return 0xff606060;
+	default: return 0xff000000;
+	}
 }
 
 void GPU::renderSprites() {
