@@ -3,10 +3,11 @@
 #include <array>
 #include "types.h"
 #include "bitref.h"
+#include "display.h"
 
 class GPU {
 	public:
-		GPU();
+		GPU(Display&);
 		void step(DWORD);
 		void writeByte(WORD, BYTE);
 		BYTE readByte(WORD);
@@ -33,7 +34,8 @@ class GPU {
 	private:
 		static const int WIDTH = 160;
 		static const int HEIGHT = 144;
-		std::array<DWORD, WIDTH * HEIGHT> display;
+		std::array<DWORD, WIDTH * HEIGHT> pixelArray;
+		Display& display;
 
 		void renderScanline();
 		void renderTiles();

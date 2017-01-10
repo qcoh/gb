@@ -12,8 +12,9 @@ std::ostream& operator<<(std::ostream& os, const GPU::Mode& mode) {
 	}
 }
 
-GPU::GPU() :
-	display{{0}},
+GPU::GPU(Display& display_) :
+	pixelArray{{0}},
+	display{display_},
 	cycleCount{0},
 	mode{Mode::HBlank},
 	vram{{0}},
@@ -38,7 +39,6 @@ GPU::GPU() :
 	wY{0},
 	wX{0}
 {
-	(void)display;
 	(void)lcdStat;
 	(void)lYC;
 	(void)dma;
@@ -78,7 +78,7 @@ void GPU::step(DWORD cycles) {
 
 			if (lY == 143) {
 				mode = Mode::VBlank;
-				// draw to screen
+				display.render(pixelArray);
 			} else {
 				mode = Mode::AccessingOAM;
 			}
@@ -248,15 +248,15 @@ void GPU::renderTiles() {
 			throw std::runtime_error{"overflowing image"};
 		}
 
-		display[static_cast<DWORD>(pixel + 160 * lY)] = 0xff000000;
-		display[static_cast<DWORD>(pixel + 160 * lY)] |= static_cast<DWORD>(pixelColor | pixelColor << 8 | pixelColor << 16);
+		pixelArray[static_cast<DWORD>(pixel + 160 * lY)] = 0xff000000;
+		pixelArray[static_cast<DWORD>(pixel + 160 * lY)] |= static_cast<DWORD>(pixelColor | pixelColor << 8 | pixelColor << 16);
 	}
 
 	// printf debugging
-	for (unsigned i = 0; i < 160; i++) {
-		std::cout << std::hex << +display[160 * lY + i] << " ";
-	}
-	std::cout << '\n';
+	//for (unsigned i = 0; i < 160; i++) {
+	//	std::cout << std::hex << +display[160 * lY + i] << " ";
+	//}
+	//std::cout << '\n';
 }
 
 void GPU::renderSprites() {
