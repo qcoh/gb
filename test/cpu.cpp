@@ -1211,5 +1211,16 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 				REQUIRE(cpu.getPC() == 0x9879);
 			}
 		}
+		WHEN("Restarting") {
+			cpu.setPC(0x1234);
+			cpu.setSP(0xffff);
+			cpu.call(0xff);
+
+			THEN("pc == 0x0038, (0xfffd) == 0x34, (0xfffe) == 0x12") {
+				REQUIRE(cpu.getPC() == 0x0038);
+				REQUIRE(data[0xfffd] == 0x34);
+				REQUIRE(data[0xfffe] == 0x12);
+			}
+		}
 	}
 }

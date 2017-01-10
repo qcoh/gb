@@ -79,6 +79,14 @@ class CPU {
 		void CALL(const WORD&);
 		void RET();
 
+		template <WORD addr>
+		void RST() {
+			mmu.writeByte(sp-1, static_cast<BYTE>(pc >> 8));
+			mmu.writeByte(sp-2, static_cast<BYTE>(pc));
+			pc = addr;
+			sp -= 2;
+		}
+
 		// 8bit arithmetic
 		void INCb(BYTE&);
 		void DECb(BYTE&);

@@ -255,7 +255,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xcc
 		{ 0xcd, std::bind(&CPU::CALL,		this, std::cref(nn)),			"CALL nn",	24, 0 }, // Takes WORD argument!!!
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 2 },
-		{}, // 0xcf
+		{ 0xcf, std::bind(&CPU::RST<0x0008>,	this),					"RST 0x0008",	16, 0 },
 		
 		{}, // 0xd0
 		{ 0xd1, std::bind(&CPU::POP,		this, std::ref(de)),			"POP DE",	12, 1 },
@@ -272,7 +272,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xdc
 		{}, // 0xdd
 		{ 0xde, std::bind(&CPU::SBC,		this, std::cref(n)),			"SBC A, n",	8, 2 },
-		{}, // 0xdf
+		{ 0xdf, std::bind(&CPU::RST<0x0018>,	this),					"RST 0x0018",	16, 0 },
 		
 		{ 0xe0, std::bind(&CPU::LD<OffsetRef<0xff00>, BYTE>, this, OffsetRef<0xff00>{n, mmu}, std::cref(a)), "LD (N+0xff00), A", 12, 2 },
 		{ 0xe1, std::bind(&CPU::POP,		this, std::ref(hl)),			"POP HL",	12, 1 },
@@ -289,7 +289,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xec
 		{}, // 0xed
 		{ 0xee, std::bind(&CPU::XOR,		this, std::cref(n)),			"XOR A, n",	8, 2 },
-		{}, // 0xef
+		{ 0xef, std::bind(&CPU::RST<0x0028>,	this),					"RST 0x0028",	16, 0 },
 
 		{ 0xf0, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(a), OffsetRef<0xff00>{n, mmu}), "LD A, (N+0xff00)", 12, 2 },
 		{ 0xf1, std::bind(&CPU::POP,		this, std::ref(af)),			"POP AF",	12, 1 },
@@ -306,7 +306,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{}, // 0xfc
 		{}, // 0xfd
 		{ 0xfe, std::bind(&CPU::CP,		this, std::cref(n)),			"CP A, n",	8, 2 },
-		{}, // 0xff
+		{ 0xff, std::bind(&CPU::RST<0x0038>,	this),					"RST 0x0038",	16, 0 },
 	}};
 
 	extended = {{
@@ -585,6 +585,9 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 }
 
 DWORD CPU::step() {
+	if (pc == 0x100) {
+		debugMode = true;
+	}
 	auto rb = mmu.readByte(pc);
 	auto& op = instructions[rb];
 	if (op.opcode != rb) {
