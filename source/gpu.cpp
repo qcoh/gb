@@ -52,8 +52,8 @@ GPU::GPU() :
 void GPU::step(DWORD cycles) {
 	cycleCount += cycles;
 
-	std::cout << "Cycle count: " << std::dec << cycleCount << '\n';
-	std::cout << "Mode: " << mode << '\n';
+	//std::cout << "Cycle count: " << std::dec << cycleCount << '\n';
+	//std::cout << "Mode: " << mode << '\n';
 
 	switch (mode) {
 	case Mode::AccessingOAM:
@@ -118,6 +118,8 @@ void GPU::writeByte(WORD addr, BYTE v) {
 			scX = v;
 			return;
 		case LCD_LY:
+			lY = v;
+			return;
 		case LCD_LYC:
 		case LCD_DMA:
 			break;
@@ -155,6 +157,7 @@ BYTE GPU::readByte(WORD addr) {
 		case LCD_SCX:
 			return scX;
 		case LCD_LY:
+			return lY;
 		case LCD_LYC:
 		case LCD_DMA:
 			break;

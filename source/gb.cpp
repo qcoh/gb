@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 		GPU gpu{};
 		auto mapper = Mapper::fromFile(argv[1]);
 		MMU mmu{std::move(mapper), gpu};
-		CPU cpu{mmu, true};
+		CPU cpu{mmu, false};
 
 		while (true) {
 			cpu.interrupt();
