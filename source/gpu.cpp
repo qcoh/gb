@@ -110,6 +110,7 @@ void GPU::writeByte(WORD addr, BYTE v) {
 			lcdControl = v;
 			return;
 		case LCD_STAT:
+			lcdStat = v;
 			break;
 		case LCD_SCY:
 			scY = v;
@@ -133,7 +134,7 @@ void GPU::writeByte(WORD addr, BYTE v) {
 		default:
 			break;
 		}
-		std::cout << "LCD register: " << std::hex << +addr << '\n';
+		std::cout << "LCD register write: " << std::hex << +addr << '\n';
 		throw std::runtime_error{"LCD registers not implemented"};
 	default:
 		std::cout << std::hex << +addr << '\n';
@@ -151,7 +152,7 @@ BYTE GPU::readByte(WORD addr) {
 		case LCD_CONTROL:
 			return lcdControl;
 		case LCD_STAT:
-			break;
+			return lcdStat;
 		case LCD_SCY:
 			return scY;
 		case LCD_SCX:
@@ -170,6 +171,7 @@ BYTE GPU::readByte(WORD addr) {
 		default:
 			break;
 		}
+		std::cout << "LCD register read: " << std::hex << +addr << '\n';
 		throw std::runtime_error{"LCD registers not implemented"};
 	default:
 		throw std::runtime_error{"Out of bounds"};
