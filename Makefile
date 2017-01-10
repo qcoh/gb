@@ -2,7 +2,7 @@ EXECUTABLE=gb
 
 CC=clang++-3.8
 CFLAGS=-MMD -MP -g -std=c++14 -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -Wcast-align -Wunused -Wconversion -Wsign-conversion -pedantic -I $(INCLUDE_DIR)
-LFLAGS=
+LFLAGS=-lSDL2
 
 BUILD_DIR=build
 SOURCE_DIR=source
