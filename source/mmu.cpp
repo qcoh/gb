@@ -118,6 +118,9 @@ void MMU::writeByte(WORD addr, BYTE v) {
 			return;
 		}
 		switch (addr & 0x00f0) {
+		case 0x0000:
+			// Serial, Timer, ignore for now
+			return;
 		case 0x0010:
 		case 0x0020:
 		case 0x0030:
