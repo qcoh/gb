@@ -13,5 +13,6 @@ void RomOnly::writeByte(WORD addr, BYTE v) {
 	(void)v;
 
 	// TODO: memory bank controller
-	throw std::runtime_error{"MBC not implemented"};
+	//throw std::runtime_error{"MBC not implemented"};
+	// tetris writes to 0x2000, see: https://www.reddit.com/r/EmuDev/comments/5ht388/gb_why_does_tetris_write_to_the_rom/
 }
