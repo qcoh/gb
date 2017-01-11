@@ -622,16 +622,20 @@ DWORD CPU::step() {
 }
 
 void CPU::interrupt() {
-	BYTE interruptFlag = mmu.readByte(0xff0f);
-	if (interruptFlag & 0b00000001) {
+	if (!ime) {
+		return;
+	}
+	BYTE intF = mmu.readByte(0xff0f);
+	BYTE intE = mmu.readByte(0xffff);
+	if (intE & intF & 0b00000001) {
 		throw std::runtime_error{"Vblank interrupt"};
-	} else if (interruptFlag & 0b00000010) {
+	} else if (intE & intF & 0b00000010) {
 		throw std::runtime_error{"LCD stat interrupt"};
-	} else if (interruptFlag & 0b00000100) {
+	} else if (intE & intF & 0b00000100) {
 		throw std::runtime_error{"Timer interrupt"};
-	} else if (interruptFlag & 0b00001000) {
+	} else if (intE & intF & 0b00001000) {
 		throw std::runtime_error{"Serial interrupt"};
-	} else if (interruptFlag & 0b00010000) {
+	} else if (intE & intF & 0b00010000) {
 		throw std::runtime_error{"Joypad interrupt"};
 	}
 }

@@ -76,7 +76,8 @@ void GPU::step(DWORD cycles) {
 			cycleCount = 0;
 			lY++;
 
-			if (lY == 143) {
+			// TODO: 144 or 143???
+			if (lY == 144) {
 				mode = Mode::VBlank;
 				display.render(pixelArray);
 			} else {
