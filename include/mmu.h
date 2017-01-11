@@ -28,4 +28,7 @@ class MMU : public IMMU {
 		BYTE interruptEnable;
 
 		std::array<BYTE, 127> hram;
+
+		std::array<BYTE, 4096> wram0;
+		std::array<BYTE, 4096> wram1;
 };

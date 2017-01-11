@@ -47,10 +47,10 @@ BYTE MMU::readByte(WORD addr) {
 		throw std::runtime_error{"Read from CartRAM"};
 	} else if (0xc000 <= addr && addr <= 0xcfff) {
 		// Work RAM (0)
-		throw std::runtime_error{"Read from WRAM (0)"};
+		return wram0[addr - 0xc000];
 	} else if (0xd000 <= addr && addr <= 0xdfff) {
 		// Work RAM (1)
-		throw std::runtime_error{"Read from WRAM (1)"};
+		return wram1[addr - 0xd000];
 	} else if (0xe000 <= addr && addr <= 0xfdff) {
 		// Echo RAM
 		throw std::runtime_error{"Read from ERAM"};
@@ -98,10 +98,10 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		throw std::runtime_error{"Write to CartRAM"};
 	} else if (0xc000 <= addr && addr <= 0xcfff) {
 		// Work RAM (0)
-		throw std::runtime_error{"Write to WRAM (0)"};
+		wram0[addr - 0xc000] = v;
 	} else if (0xd000 <= addr && addr <= 0xdfff) {
 		// Work RAM (1)
-		throw std::runtime_error{"Write to WRAM (1)"};
+		wram1[addr - 0xd000] = v;
 	} else if (0xe000 <= addr && addr <= 0xfdff) {
 		// Echo RAM
 		throw std::runtime_error{"Write to ERAM"};
