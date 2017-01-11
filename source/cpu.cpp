@@ -294,7 +294,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0xf0, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(a), OffsetRef<0xff00>{n, mmu}), "LD A, (N+0xff00)", 12, 1 },
 		{ 0xf1, std::bind(&CPU::POP,		this, std::ref(af)),			"POP AF",	12, 0 },
 		{ 0xf2, std::bind(&CPU::LD<BYTE, OffsetRef<0xff00>>, this, std::ref(c), OffsetRef<0xff00>{c, mmu}), "LD A, (C+0xff00)", 8, 0 },
-		{ 0xf3, std::bind(&CPU::DI,		this),					"EI",		4, 0 },
+		{ 0xf3, std::bind(&CPU::DI,		this),					"DI",		4, 0 },
 		{}, // 0xf4
 		{ 0xf5, std::bind(&CPU::PUSH,		this, std::cref(af)),			"PUSH AF",	16, 0 },
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 1 },
