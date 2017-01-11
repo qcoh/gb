@@ -1192,11 +1192,11 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 
 			cpu.call(0xcd);
 
-			THEN("pc == 0x2233, sp == 0xfffd, (0xfffe) == 0x22, (0xfffd) == 0x37") {
+			THEN("pc == 0x2233, sp == 0xfffd, (0xfffe) == 0x12, (0xfffd) == 0x37") {
 				REQUIRE(cpu.getPC() == 0x2233);
 				REQUIRE(cpu.getSP() == 0xfffd);
 				REQUIRE(data[0xfffe] == 0x12);
-				REQUIRE(data[0xfffd] == 0x37);
+				REQUIRE(data[0xfffd] == 0x36);
 			}
 		}
 		WHEN("Returning from function") {
@@ -1208,7 +1208,7 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 			cpu.call(0xc9);
 
 			THEN("pc == 0x9879") {
-				REQUIRE(cpu.getPC() == 0x9879);
+				REQUIRE(cpu.getPC() == 0x9878);
 			}
 		}
 		WHEN("Restarting") {
