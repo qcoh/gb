@@ -112,7 +112,7 @@ void GPU::writeByte(WORD addr, BYTE v) {
 			return;
 		case LCD_STAT:
 			lcdStat = v;
-			break;
+			return;
 		case LCD_SCY:
 			scY = v;
 			return;
@@ -129,7 +129,11 @@ void GPU::writeByte(WORD addr, BYTE v) {
 			bgp = v;
 			return;
 		case LCD_OBP0:
+			obp0 = v;
+			return;
 		case LCD_OBP1:
+			obp1 = v;
+			return;
 		case LCD_WY:
 		case LCD_WX:
 		default:
@@ -166,7 +170,9 @@ BYTE GPU::readByte(WORD addr) {
 		case LCD_BGP:
 			return bgp;
 		case LCD_OBP0:
+			return obp0;
 		case LCD_OBP1:
+			return obp1;
 		case LCD_WY:
 		case LCD_WX:
 		default:
