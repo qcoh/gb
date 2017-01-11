@@ -93,7 +93,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 		{ 0x33, std::bind(&CPU::INC, 			this, std::ref(sp)), 			"INC SP", 	8, 0 },
 		{}, // 0x34
 		{}, // 0x35
-		{}, // 0x36
+		{ 0x36, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{hl, mmu}, std::cref(n)),	"LD (HL), N",	12, 1 },
 		{ 0x37, std::bind(&CPU::SCF,			this),					"SCF",		4, 0 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 0 },
 		{ 0x39, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(sp)),	"ADD HL, SP",	8, 0 },
