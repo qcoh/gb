@@ -9,8 +9,9 @@
 #include "memref.h"
 #include "offsetref.h"
 
-CPU::CPU(IMMU& mmu_, bool debugMode_) :
-	debugMode{debugMode_},
+CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
+	breakpoint{breakpoint_},
+	debugMode{false},
 	mmu{mmu_},
 	pc{0},
 	sp{0},
@@ -585,7 +586,7 @@ CPU::CPU(IMMU& mmu_, bool debugMode_) :
 }
 
 DWORD CPU::step() {
-	if (pc == 0x100) {
+	if (pc == breakpoint) {
 		debugMode = true;
 	}
 	auto rb = mmu.readByte(pc++);

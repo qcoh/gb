@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 		GPU gpu{display};
 		auto mapper = Mapper::fromFile(argv[1]);
 		MMU mmu{std::move(mapper), gpu};
-		CPU cpu{mmu, false};
+		CPU cpu{mmu, 0x0281};
 
 		while (!quit) {
 			cpu.interrupt();
