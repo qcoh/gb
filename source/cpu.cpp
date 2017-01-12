@@ -629,7 +629,7 @@ void CPU::interrupt() {
 	BYTE intF = mmu.readByte(0xff0f);
 	BYTE intE = mmu.readByte(0xffff);
 	if (intE & intF & 0b00000001) {
-		throw std::runtime_error{"Vblank interrupt"};
+		RST_INT<0x0040, 0b00000001>();
 	} else if (intE & intF & 0b00000010) {
 		throw std::runtime_error{"LCD stat interrupt"};
 	} else if (intE & intF & 0b00000100) {

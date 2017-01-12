@@ -87,6 +87,19 @@ class CPU {
 			pc = addr;
 			sp -= 2;
 		}
+		template <WORD addr, BYTE mask>
+		void RST_INT() {
+			ime = false;
+			mmu.writeByte(sp-1, static_cast<BYTE>(pc >> 8));
+			mmu.writeByte(sp-2, static_cast<BYTE>(pc));
+			pc = addr;
+			sp -= 2;
+
+			// disable flag
+			BYTE intF = mmu.readByte(0xff0f);
+			intF ^= mask;
+			mmu.writeByte(0xff0f, intF);
+		}
 
 		// 8bit arithmetic
 		void INCb(BYTE&);
