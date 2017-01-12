@@ -149,6 +149,14 @@ void MMU::writeByte(WORD addr, BYTE v) {
 			return;
 		case 0x0040:
 			// video
+			if (addr == 0xff46) {
+				// DMA transfer
+				for (WORD i = 0; i < 0xa0; i++) {
+					writeByte(static_cast<WORD>(0xfe00 + i), readByte(static_cast<WORD>((v << 8) + i)));
+				}
+				return;
+				
+			}
 			gpu.writeByte(addr, v);
 			return;
 		case 0x0050:
