@@ -46,6 +46,7 @@ class GPU {
 		Mode mode;
 
 		std::array<BYTE, 0x2000> vram;
+		std::array<BYTE, 0xa0> oam;
 
 		// 0xff40: LCD Control register
 		BYTE lcdControl;

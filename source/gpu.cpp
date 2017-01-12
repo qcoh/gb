@@ -18,6 +18,7 @@ GPU::GPU(Display& display_) :
 	cycleCount{0},
 	mode{Mode::HBlank},
 	vram{{0}},
+	oam{{0}},
 	lcdControl{0},
 	lcdEnable{lcdControl},
 	windowTileSelect{lcdControl},
@@ -106,6 +107,11 @@ void GPU::writeByte(WORD addr, BYTE v) {
 		vram[addr - 0x8000] = v;
 		return;
 	case 0xf000:
+		if ((addr & 0xff00) == 0xfe00) {
+			// OAM
+			oam[addr - 0xfe00] = v;
+			return;
+		}
 		switch (addr) {
 		case LCD_CONTROL:
 			lcdControl = v;
@@ -153,6 +159,10 @@ BYTE GPU::readByte(WORD addr) {
 	case 0x9000:
 		return vram[addr - 0x8000];
 	case 0xf000:
+		if ((addr & 0xff00) == 0xfe00) {
+			// OAM
+			return oam[addr - 0xfe00];
+		}
 		switch (addr) {
 		case LCD_CONTROL:
 			return lcdControl;
