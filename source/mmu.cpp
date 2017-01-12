@@ -56,17 +56,22 @@ BYTE MMU::readByte(WORD addr) {
 		throw std::runtime_error{"Read from ERAM"};
 	} else if (0xfe00 <= addr && addr <= 0xfe9f) {
 		// Object Attribute Memory
-		throw std::runtime_error{"Read from OAM"};
+		return gpu.readByte(addr);
 	} else if (0xfea0 <= addr && addr <= 0xfeff) {
 		// Not usable
 		// see: https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
 		return 0xff;
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
-		if (addr == 0xff0f) {
-			return interruptFlag;
-		}
 		switch (addr & 0x00f0) {
+		case 0x0000:
+			switch (addr) {
+			case 0xff0f:
+				return interruptFlag;
+			default:
+				break;
+			}
+			break;
 		case 0x0010:
 		case 0x0020:
 		case 0x0030:
@@ -75,9 +80,19 @@ BYTE MMU::readByte(WORD addr) {
 		case 0x0040:
 			// video
 			return gpu.readByte(addr);
+		case 0x0070:
+			switch (addr) {
+			case 0xff7f:
+				// off by one error? https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
+				return 0xff;
+			default:
+				break;
+			}
+			break;
 		default:
-			throw std::runtime_error{"Read from IO registers"};
+			break;
 		}
+		throw std::runtime_error{"Read from IO registers"};
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
 		return hram[addr - 0xff80];
@@ -108,21 +123,27 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		throw std::runtime_error{"Write to ERAM"};
 	} else if (0xfe00 <= addr && addr <= 0xfe9f) {
 		// Object Attribute Memory
-		throw std::runtime_error{"Write to OAM"};
+		gpu.writeByte(addr, v);
 	} else if (0xfea0 <= addr && addr <= 0xfeff) {
 		// Not usable
 		// see: https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
 		return;
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
-		if (addr == 0xff0f) {
-			interruptFlag = v;
-			return;
-		}
 		switch (addr & 0x00f0) {
 		case 0x0000:
-			// Serial, Timer, ignore for now
-			return;
+			// Serial, Timer, interrupt
+			switch (addr) {
+			case 0xff0f:
+				interruptFlag = v;
+				return;
+			case 0xff7f:
+				// off by one error? https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
+				return;
+			default:
+				break;
+			}
+			break;
 		case 0x0010:
 		case 0x0020:
 		case 0x0030:
@@ -137,10 +158,20 @@ void MMU::writeByte(WORD addr, BYTE v) {
 				biosMode = false;
 				return;
 			}
+		case 0x0070:
+			switch (addr) {
+			case 0xff7f:
+				// off by one error? https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
+				return;
+			default:
+				break;
+			}
+			break;
 		default:
-			std::cout << "Write to " << std::hex << +addr << '\n';
-			throw std::runtime_error{"Write to IO registers"};
+			break;
 		}
+		std::cout << "Write to " << std::hex << +addr << '\n';
+		throw std::runtime_error{"Write to IO registers"};
 	} else if (0xff80 <= addr && addr <= 0xfffe) {
 		// High RAM
 		hram[addr - 0xff80] = v;
