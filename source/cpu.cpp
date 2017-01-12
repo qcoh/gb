@@ -303,7 +303,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{}, // 0xf8
 		{}, // 0xf9
 		{ 0xfa, std::bind(&CPU::LD<BYTE, MemRef>, this, std::ref(a), MemRef{nn, mmu}),	"LD A, (nn)",	16, 2 },
-		{ 0xfb, std::bind(&CPU::EI,		this),					"DI",		4, 0 },
+		{ 0xfb, std::bind(&CPU::EI,		this),					"EI",		4, 0 },
 		{}, // 0xfc
 		{}, // 0xfd
 		{ 0xfe, std::bind(&CPU::CP,		this, std::cref(n)),			"CP A, n",	8, 1 },
