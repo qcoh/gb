@@ -59,7 +59,8 @@ BYTE MMU::readByte(WORD addr) {
 		throw std::runtime_error{"Read from OAM"};
 	} else if (0xfea0 <= addr && addr <= 0xfeff) {
 		// Not usable
-		throw std::runtime_error{"Read from unusable memory"};
+		// see: https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
+		return 0xff;
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
 		if (addr == 0xff0f) {
@@ -110,7 +111,8 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		throw std::runtime_error{"Write to OAM"};
 	} else if (0xfea0 <= addr && addr <= 0xfeff) {
 		// Not usable
-		throw std::runtime_error{"Write to unusable memory"};
+		// see: https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
+		return;
 	} else if (0xff00 <= addr && addr <= 0xff7f) {
 		// IO registers
 		if (addr == 0xff0f) {
