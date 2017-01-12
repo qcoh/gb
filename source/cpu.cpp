@@ -241,7 +241,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xbe, std::bind(&CPU::CP,		this, MemRef{hl, mmu}),			"CP A, (HL)",	8, 0 },
 		{ 0xbf, std::bind(&CPU::CP,		this, std::cref(a)),			"CP A, A",	4, 0 },
 		
-		{}, // 0xc0
+		{ 0xc0, std::bind(&CPU::RETncond,	this, zeroFlag),			"RET NZ",	0, 0 },
 		{ 0xc1, std::bind(&CPU::POP,		this, std::ref(bc)),			"POP BC",	12, 0 },
 		{ 0xc2, std::bind(&CPU::JPn,		this, zeroFlag,	std::cref(nn)),		"JP NZ, nn",	0, 0 },
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 0 },
@@ -249,7 +249,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xc5, std::bind(&CPU::PUSH,		this, std::cref(bc)),			"PUSH BC",	16, 0 },
 		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 1 },
 		{}, // 0xc7
-		{}, // 0xc8
+		{ 0xc8, std::bind(&CPU::RETcond,	this, zeroFlag),			"RET Z",	0, 0 },
 		{ 0xc9, std::bind(&CPU::RET,		this),					"RET",		16, 0 }, // !!!
 		{ 0xca, std::bind(&CPU::JP,		this, zeroFlag, std::cref(nn)),		"JP Z, nn",	0, 0 },
 		{ 0xcb, std::bind(&CPU::CB,		this),					"CB",		4, 1 },
@@ -258,7 +258,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xce, std::bind(&CPU::ADC,		this, std::cref(n)),			"ADC A, n",	8, 1 },
 		{ 0xcf, std::bind(&CPU::RST<0x0008>,	this),					"RST 0x0008",	16, 0 }, // !!!
 		
-		{}, // 0xd0
+		{ 0xd0, std::bind(&CPU::RETncond,	this, carryFlag),			"RET NC",	0, 0 },
 		{ 0xd1, std::bind(&CPU::POP,		this, std::ref(de)),			"POP DE",	12, 0 },
 		{ 0xd2, std::bind(&CPU::JPn,		this, carryFlag, std::cref(nn)),	"JP NC, nn",	0, 0 },
 		{}, // 0xd3
@@ -266,7 +266,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xd5, std::bind(&CPU::PUSH,		this, std::cref(de)),			"PUSH DE",	16, 0 },
 		{ 0xd6, std::bind(&CPU::SUB,		this, std::cref(n)),			"SUB A, n",	8, 1 },
 		{}, // 0xd7
-		{}, // 0xd8
+		{ 0xd8, std::bind(&CPU::RETcond,	this, carryFlag),			"RET C",	0, 0 },
 		{}, // 0xd9
 		{ 0xda, std::bind(&CPU::JP,		this, carryFlag, std::cref(nn)),	"JP C, nn", 	0, 0 },
 		{}, // 0xdb
@@ -909,3 +909,20 @@ void CPU::RET() {
 	pc = static_cast<WORD>((high << 8) + low);
 	sp += 1;
 }
+
+void CPU::RETcond(const bool& cond) {
+	if (cond) {
+		RET();
+		cycles += 12;
+	}
+	cycles += 8;
+}
+
+void CPU::RETncond(const bool& cond) {
+	if (!cond) {
+		RET();
+		cycles += 12;
+	}
+	cycles += 8;
+}
+

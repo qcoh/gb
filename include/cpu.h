@@ -79,6 +79,8 @@ class CPU {
 
 		void CALL(const WORD&);
 		void RET();
+		void RETcond(const bool&);
+		void RETncond(const bool&);
 
 		template <WORD addr>
 		void RST() {
