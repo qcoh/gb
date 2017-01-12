@@ -69,9 +69,8 @@ BYTE MMU::readByte(WORD addr) {
 			case 0xff0f:
 				return interruptFlag;
 			default:
-				break;
+				return 0x00;
 			}
-			break;
 		case 0x0010:
 		case 0x0020:
 		case 0x0030:
@@ -141,9 +140,8 @@ void MMU::writeByte(WORD addr, BYTE v) {
 				// off by one error? https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
 				return;
 			default:
-				break;
+				return;;
 			}
-			break;
 		case 0x0010:
 		case 0x0020:
 		case 0x0030:
