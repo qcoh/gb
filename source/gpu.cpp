@@ -145,7 +145,7 @@ void GPU::writeByte(WORD addr, BYTE v) {
 		default:
 			break;
 		}
-		std::cout << "LCD register write: " << std::hex << +addr << '\n';
+		std::cout << "LCD register write: (" << std::hex << +addr << ") = 0x" << +v << '\n';
 		throw std::runtime_error{"LCD registers not implemented"};
 	default:
 		std::cout << std::hex << +addr << '\n';
