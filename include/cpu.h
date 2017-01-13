@@ -104,8 +104,6 @@ class CPU {
 		}
 
 		// 8bit arithmetic
-		void INCb(BYTE&);
-		void DECb(BYTE&);
 		void ADD(const BYTE&);
 		void ADC(const BYTE&);
 		void SUB(const BYTE&);
@@ -122,9 +120,34 @@ class CPU {
 
 		// 16bit arithmetic
 		void ADD(WORD&, const WORD&);
+
+		// mixed
 		void ADD(WORD&, const BYTE&);
-		void INC(WORD&);
-		void DEC(WORD&);
+
+		template <typename T>
+		void INC(T& target) {
+			halfFlag = ((((target & 0xf) + 1) & 0xf0) != 0);
+			target++;
+			zeroFlag = (target == 0);
+			negFlag = false;
+		}
+		// Highly annoying: Can't specialize in class scope (for no apparent reason: https://cplusplus.github.io/EWG/ewg-active.html#41)
+		// template <>
+		void INC(WORD& target) {
+			target++;
+		}
+
+		template <typename T>
+		void DEC(T& target) {
+			halfFlag = ((target & 0xf) == 0);
+			target--;
+			zeroFlag = (target == 0);
+			negFlag = true;
+		}
+		// template <>
+		void DEC(WORD& target) {
+			target--;
+		}
 
 		// shift and rotate
 		void RLCA();
