@@ -121,7 +121,8 @@ class CPU {
 		void DAA();
 
 		// 16bit arithmetic
-		void ADD16(WORD&, const WORD&);
+		void ADD(WORD&, const WORD&);
+		void ADD(WORD&, const BYTE&);
 		void INC(WORD&);
 		void DEC(WORD&);
 

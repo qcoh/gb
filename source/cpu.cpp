@@ -46,7 +46,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0x06, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(b), std::cref(n)), 	"LD B, n",	8, 1 },
 		{ 0x07, std::bind(&CPU::RLCA,			this),					"RLCA",		4, 0 },
 		{ 0x08, std::bind(&CPU::LD<MemRef, WORD>,	this, MemRef{nn, mmu}, std::cref(sp)),	"LD (nn), SP",	20, 2 },
-		{ 0x09, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(bc)),	"ADD HL, BC",	8, 0 },
+		{ 0x09, std::bind<void(CPU::*)(WORD&, const WORD&)>(&CPU::ADD, this, std::ref(hl), std::cref(bc)), "ADD HL, BC", 8, 0 },
 		{ 0x0a, std::bind(&CPU::LD<BYTE, MemRef>,	this, std::ref(a), MemRef{bc, mmu}),	"LD A, (BC)",	8, 0 },
 		{ 0x0b, std::bind(&CPU::DEC,			this, std::ref(bc)), 			"DEC BC", 	8, 0 },
 		{ 0x0c, std::bind(&CPU::INCb,			this, std::ref(c)),			"INC C",	4, 0 },
@@ -63,7 +63,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0x16, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(d), std::cref(n)), 	"LD D, n", 	8, 1 },
 		{ 0x17, std::bind(&CPU::RLA,			this),					"RLA",		4, 0 },
 		{ 0x18, std::bind(&CPU::JR,			this, true, std::cref(n)),		"JR n",		0, 0 },
-		{ 0x19, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(de)),	"ADD HL, DE",	8, 0 },
+		{ 0x19, std::bind<void(CPU::*)(WORD&, const WORD&)>(&CPU::ADD, this, std::ref(hl), std::cref(de)), "ADD HL, DE", 8, 0 },
 		{ 0x1a, std::bind(&CPU::LD<BYTE, MemRef>,	this, std::ref(a), MemRef{de, mmu}),	"LD A, (DE)",	8, 0 },
 		{ 0x1b, std::bind(&CPU::DEC, 			this, std::ref(de)), 			"DEC DE", 	8, 0 },
 		{ 0x1c, std::bind(&CPU::INCb,			this, std::ref(e)),			"INC E",	4, 0 },
@@ -80,7 +80,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0x26, std::bind(&CPU::LD<BYTE, BYTE>, 	this, std::ref(h), std::cref(n)), 	"LD H, n", 	8, 1 },
 		{ 0x27, std::bind(&CPU::DAA,			this),					"DAA",		4, 0 },
 		{ 0x28, std::bind(&CPU::JR,			this, zeroFlag, std::cref(n)),		"JR Z, n",	0, 0 },
-		{ 0x29, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(hl)),	"ADD HL, HL",	8, 0 },
+		{ 0x29, std::bind<void(CPU::*)(WORD&, const WORD&)>(&CPU::ADD, this, std::ref(hl), std::cref(hl)), "ADD HL, HL", 8, 0 },
 		{ 0x2a, std::bind(&CPU::LDI<BYTE, MemRef>,	this, std::ref(a), MemRef{hl, mmu}),	"LDI A, (HL+)", 8, 0 },
 		{ 0x2b, std::bind(&CPU::DEC, 			this, std::ref(hl)), 			"DEC HL", 	8, 0 },
 		{ 0x2c, std::bind(&CPU::INCb,			this, std::ref(l)),			"INC L",	4, 0 },
@@ -97,7 +97,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0x36, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{hl, mmu}, std::cref(n)),	"LD (HL), N",	12, 1 },
 		{ 0x37, std::bind(&CPU::SCF,			this),					"SCF",		4, 0 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 0 },
-		{ 0x39, std::bind(&CPU::ADD16,			this, std::ref(hl), std::cref(sp)),	"ADD HL, SP",	8, 0 },
+		{ 0x39, std::bind<void(CPU::*)(WORD&, const WORD&)>(&CPU::ADD, this, std::ref(hl), std::cref(sp)), "ADD HL, SP", 8, 0 },
 		{ 0x3a, std::bind(&CPU::LDD<BYTE, MemRef>,	this, std::ref(a), MemRef{hl, mmu}),	"LDD A, (HL-)", 8, 0 },
 		{ 0x3b, std::bind(&CPU::DEC,			this, std::ref(sp)), 			"DEC SP", 	8, 0 },
 		{ 0x3c, std::bind(&CPU::INCb,			this, std::ref(a)),			"INC A",	4, 0 },
@@ -173,14 +173,14 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0x7e, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), MemRef{hl, mmu}),	"LD A, (HL)",	8, 0 },
 		{ 0x7f, std::bind(&CPU::LD<BYTE, BYTE>,	this, std::ref(a), std::cref(a)),	"LD A, A",	4, 0 },
 
-		{ 0x80, std::bind(&CPU::ADD,		this, std::cref(b)),			"ADD A, B",	4, 0 },
-		{ 0x81, std::bind(&CPU::ADD,		this, std::cref(c)),			"ADD A, C",	4, 0 },
-		{ 0x82, std::bind(&CPU::ADD,		this, std::cref(d)),			"ADD A, D",	4, 0 },
-		{ 0x83, std::bind(&CPU::ADD,		this, std::cref(e)),			"ADD A, E",	4, 0 },
-		{ 0x84, std::bind(&CPU::ADD,		this, std::cref(h)),			"ADD A, H",	4, 0 },
-		{ 0x85, std::bind(&CPU::ADD,		this, std::cref(l)),			"ADD A, L",	4, 0 },
-		{ 0x86, std::bind(&CPU::ADD,		this, MemRef{hl, mmu}),			"ADD A, (HL)",	8, 0 },
-		{ 0x87, std::bind(&CPU::ADD,		this, std::cref(a)),			"ADD A, A",	4, 0 },
+		{ 0x80, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(b)),		"ADD A, B",	4, 0 },
+		{ 0x81, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(c)),		"ADD A, C",	4, 0 },
+		{ 0x82, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(d)),		"ADD A, D",	4, 0 },
+		{ 0x83, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(e)),		"ADD A, E",	4, 0 },
+		{ 0x84, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(h)),		"ADD A, H",	4, 0 },
+		{ 0x85, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(l)),		"ADD A, L",	4, 0 },
+		{ 0x86, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, MemRef{hl, mmu}),		"ADD A, (HL)",	8, 0 },
+		{ 0x87, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(a)),		"ADD A, A",	4, 0 },
 		{ 0x88, std::bind(&CPU::ADC,		this, std::cref(b)),			"ADC A, B",	4, 0 },
 		{ 0x89, std::bind(&CPU::ADC,		this, std::cref(c)),			"ADC A, C",	4, 0 },
 		{ 0x8a, std::bind(&CPU::ADC,		this, std::cref(d)),			"ADC A, D",	4, 0 },
@@ -247,7 +247,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xc3, std::bind(&CPU::JP,		this, true, std::cref(nn)),		"JP nn",	0, 0 },
 		{}, // 0xc4
 		{ 0xc5, std::bind(&CPU::PUSH,		this, std::cref(bc)),			"PUSH BC",	16, 0 },
-		{ 0xc6, std::bind(&CPU::ADD,		this, std::cref(n)),			"ADD A, n",	8, 1 },
+		{ 0xc6, std::bind<void(CPU::*)(const BYTE&)>(&CPU::ADD,	this, std::cref(n)),		"ADD A, n",	8, 1 },
 		{}, // 0xc7
 		{ 0xc8, std::bind(&CPU::RETcond,	this, zeroFlag),			"RET Z",	0, 0 },
 		{ 0xc9, std::bind(&CPU::RET,		this),					"RET",		16, 0 }, // !!!
@@ -817,12 +817,18 @@ void CPU::RRA() {
 	negFlag = false;
 }
 
-void CPU::ADD16(WORD& target, const WORD& source) {
+void CPU::ADD(WORD& target, const WORD& source) {
 	int temp = target + source;
 	carryFlag = (temp > 0xffff);
 	negFlag = false;
 	halfFlag = ((((target & 0x0fff) + (source & 0x0fff)) & 0xf000) != 0);
 	target = static_cast<WORD>(temp);
+}
+
+void CPU::ADD(WORD& target, const BYTE& source) {
+	zeroFlag = false;
+	WORD w = static_cast<WORD>(source);
+	ADD(target, w);
 }
 
 void CPU::CCF() {
