@@ -267,7 +267,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xd6, std::bind(&CPU::SUB,		this, std::cref(n)),			"SUB A, n",	8, 1 },
 		{}, // 0xd7
 		{ 0xd8, std::bind(&CPU::RETcond,	this, carryFlag),			"RET C",	0, 0 },
-		{}, // 0xd9
+		{ 0xd9, std::bind(&CPU::RETI,		this),					"RETI",		16, 0 },
 		{ 0xda, std::bind(&CPU::JP,		this, carryFlag, std::cref(nn)),	"JP C, nn", 	0, 0 },
 		{}, // 0xdb
 		{}, // 0xdc
@@ -910,3 +910,7 @@ void CPU::RETncond(const bool& cond) {
 	cycles += 8;
 }
 
+void CPU::RETI() {
+	ime = true;
+	RET();
+}

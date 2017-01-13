@@ -81,6 +81,7 @@ class CPU {
 		void RET();
 		void RETcond(const bool&);
 		void RETncond(const bool&);
+		void RETI();
 
 		template <WORD addr>
 		void RST() {
