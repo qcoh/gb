@@ -283,7 +283,7 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0xe5, std::bind(&CPU::PUSH,		this, std::cref(hl)),			"PUSH HL",	16, 0 },
 		{ 0xe6, std::bind(&CPU::AND,		this, std::cref(n)),			"AND A, n",	8, 1 },
 		{}, // 0xe7
-		{}, // 0xe8
+		{ 0xe8, std::bind<void(CPU::*)(WORD&, const BYTE&)>(&CPU::ADD, this, std::ref(sp), std::cref(n)), "ADD SP, n", 16, 1 },
 		{}, // 0xe9
 		{ 0xea, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{nn, mmu}, std::cref(a)),	"LD (nn), A",	16, 2 },
 		{}, // 0xeb

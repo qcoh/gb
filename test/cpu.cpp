@@ -750,6 +750,17 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == false);
 			}
 		}
+		WHEN("adding n to sp") {
+			cpu.setSP(0x0fff);
+			cpu.setN(1);
+			cpu.call(0xe8);
+
+			THEN("sp == 0x1000, carryFlag == false, halfFlag == true") {
+				REQUIRE(cpu.getSP() == 0x1000);
+				REQUIRE(cpu.getCarry() == false);
+				REQUIRE(cpu.getHalf() == true);
+			}
+		}
 		WHEN("cpling") {
 			cpu.setA(0b10101010);
 			cpu.call(0x2f);
