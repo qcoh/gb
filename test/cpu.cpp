@@ -631,6 +631,24 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == false);
 			}
 		}
+		WHEN("inc (hl)") {
+			cpu.setHL(0);
+			data[0] = 0x12;
+			cpu.call(0x34);
+
+			THEN("(0) == 0x13") {
+				REQUIRE(data[0] == 0x13);
+			}
+		}
+		WHEN("dec (hl)") {
+			cpu.setHL(0x5);
+			data[5] = 0x77;
+			cpu.call(0x35);
+
+			THEN("(0x5) == 0x76") {
+				REQUIRE(data[0x5] == 0x76);
+			}
+		}
 		WHEN("rlcaing (1)") {
 			cpu.setA(0b10000000);
 			cpu.call(0x07);

@@ -127,7 +127,7 @@ class CPU {
 		template <typename T>
 		void INC(T& target) {
 			halfFlag = ((((target & 0xf) + 1) & 0xf0) != 0);
-			target++;
+			target = static_cast<BYTE>(target + 1);
 			zeroFlag = (target == 0);
 			negFlag = false;
 		}
@@ -140,7 +140,7 @@ class CPU {
 		template <typename T>
 		void DEC(T& target) {
 			halfFlag = ((target & 0xf) == 0);
-			target--;
+			target = static_cast<BYTE>(target - 1);
 			zeroFlag = (target == 0);
 			negFlag = true;
 		}

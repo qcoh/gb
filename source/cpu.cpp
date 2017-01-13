@@ -92,8 +92,8 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 		{ 0x31, std::bind(&CPU::LD<WORD, WORD>, 	this, std::ref(sp), std::cref(nn)), 	"LD SP, nn", 	12, 2 },
 		{ 0x32, std::bind(&CPU::LDD<MemRef, BYTE>,	this, MemRef{hl, mmu}, std::cref(a)),	"LDD (HL-), A", 8, 0 },
 		{ 0x33, std::bind<void(CPU::*)(WORD&)>(&CPU::INC, this, std::ref(sp)), 			"INC SP", 	8, 0 },
-		{}, // 0x34
-		{}, // 0x35
+		{ 0x34, std::bind(&CPU::INC<MemRef>,		this, MemRef{hl, mmu}),			"INC (HL)",	12, 0 },
+		{ 0x35, std::bind(&CPU::DEC<MemRef>,		this, MemRef{hl, mmu}),			"DEC (HL)",	12, 0 },
 		{ 0x36, std::bind(&CPU::LD<MemRef, BYTE>,	this, MemRef{hl, mmu}, std::cref(n)),	"LD (HL), N",	12, 1 },
 		{ 0x37, std::bind(&CPU::SCF,			this),					"SCF",		4, 0 },
 		{ 0x38, std::bind(&CPU::JR,			this, carryFlag, std::cref(n)),		"JR C, n",	0, 0 },
