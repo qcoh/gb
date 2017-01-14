@@ -2,10 +2,13 @@
 #include "cpu.h"
 #include "romonly.h"
 #include "mmu.h"
+#include "interruptstate.h"
+
+static InterruptState intState_{};
 
 class TestCPU : public CPU {
 	public:
-		TestCPU(IMMU& mmu_) : CPU{mmu_} {
+		TestCPU(IMMU& mmu_) : CPU{mmu_, intState_} {
 		}
 
 		void call(BYTE op) {

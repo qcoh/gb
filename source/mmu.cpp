@@ -21,12 +21,11 @@ std::array<BYTE, 256> MMU::bios{{
 	0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50,
 }};
 
-MMU::MMU(std::unique_ptr<Mapper>&& mapper_, GPU& gpu_) : 
+MMU::MMU(std::unique_ptr<Mapper>&& mapper_, GPU& gpu_, InterruptState& intState_) : 
 	mapper{std::move(mapper_)},
 	gpu{gpu_},
+	intState{intState_},
 	biosMode{true},
-	interruptFlag{0},
-	interruptEnable{0},
 	hram{{0}}
 {
 }
@@ -67,7 +66,7 @@ BYTE MMU::readByte(WORD addr) {
 		case 0x0000:
 			switch (addr) {
 			case 0xff0f:
-				return interruptFlag;
+				return intState.intFlag;
 			default:
 				return 0x00;
 			}
@@ -96,7 +95,7 @@ BYTE MMU::readByte(WORD addr) {
 		// High RAM
 		return hram[addr - 0xff80];
 	} else /* 0xffff */ {
-		return interruptEnable;
+		return intState.intEnable;
 	}
 	// TODO:
 	//return mapper->readByte(addr);
@@ -134,7 +133,7 @@ void MMU::writeByte(WORD addr, BYTE v) {
 			// Serial, Timer, interrupt
 			switch (addr) {
 			case 0xff0f:
-				interruptFlag = v;
+				intState.intFlag = v;
 				return;
 			case 0xff7f:
 				// off by one error? https://www.reddit.com/r/EmuDev/comments/5nixai/gb_tetris_writing_to_unused_memory/
@@ -183,6 +182,6 @@ void MMU::writeByte(WORD addr, BYTE v) {
 		hram[addr - 0xff80] = v;
 		return;
 	} else /* 0xffff */ {
-		interruptEnable = v;
+		intState.intEnable = v;
 	}
 }

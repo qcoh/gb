@@ -7,10 +7,11 @@
 #include "mapper.h"
 #include "types.h"
 #include "gpu.h"
+#include "interruptstate.h"
 
 class MMU : public IMMU {
 	public:
-		MMU(std::unique_ptr<Mapper>&&, GPU&);
+		MMU(std::unique_ptr<Mapper>&&, GPU&, InterruptState&);
 
 		virtual BYTE readByte(WORD) override;
 		virtual void writeByte(WORD, BYTE) override;
@@ -21,11 +22,9 @@ class MMU : public IMMU {
 		static std::array<BYTE, 256> bios;
 
 		GPU& gpu;
+		InterruptState& intState;
 
 		bool biosMode;
-
-		BYTE interruptFlag;
-		BYTE interruptEnable;
 
 		std::array<BYTE, 127> hram;
 

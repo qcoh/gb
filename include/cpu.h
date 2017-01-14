@@ -4,18 +4,20 @@
 #include "types.h"
 #include "instruction.h"
 #include "bitref.h"
+#include "interruptstate.h"
 
 class CPU {
 	public:
-		CPU(IMMU&, WORD = 0);
+		CPU(IMMU&, InterruptState&, WORD = 0);
 
 		DWORD step();
-		void interrupt();
+		void handleInterrupts();
 	protected:
 		WORD breakpoint;
 		bool debugMode;
 
 		IMMU& mmu;
+		InterruptState& intState;
 
 		WORD pc;
 		WORD sp;
@@ -42,9 +44,6 @@ class CPU {
 		// immediate byte/word
 		BYTE n;
 		WORD nn;
-
-		// interrupt master enable flag
-		bool ime;
 
 		// number of cycles of last instruction
 		DWORD cycles;
@@ -92,16 +91,14 @@ class CPU {
 		}
 		template <WORD addr, BYTE mask>
 		void RST_INT() {
-			ime = false;
+			intState.ime = false;
 			mmu.writeByte(sp-1, static_cast<BYTE>(pc >> 8));
 			mmu.writeByte(sp-2, static_cast<BYTE>(pc));
 			pc = addr;
 			sp -= 2;
 
 			// disable flag
-			BYTE intF = mmu.readByte(0xff0f);
-			intF ^= mask;
-			mmu.writeByte(0xff0f, intF);
+			intState.intFlag ^= mask;
 		}
 
 		// 8bit arithmetic

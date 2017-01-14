@@ -9,10 +9,11 @@
 #include "memref.h"
 #include "offsetref.h"
 
-CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
+CPU::CPU(IMMU& mmu_, InterruptState& intState_, WORD breakpoint_) :
 	breakpoint{breakpoint_},
 	debugMode{false},
 	mmu{mmu_},
+	intState{intState_},
 	pc{0},
 	sp{0},
 	af{0},
@@ -33,7 +34,6 @@ CPU::CPU(IMMU& mmu_, WORD breakpoint_) :
 	carryFlag{f},
 	n{0},
 	nn{0},
-	ime{false},
 	cycles{0}
 {
 	instructions = {{
@@ -622,21 +622,19 @@ DWORD CPU::step() {
 	return cycles;
 }
 
-void CPU::interrupt() {
-	if (!ime) {
+void CPU::handleInterrupts() {
+	if (!intState.ime) {
 		return;
 	}
-	BYTE intF = mmu.readByte(0xff0f);
-	BYTE intE = mmu.readByte(0xffff);
-	if (intE & intF & 0b00000001) {
+	if (intState.vBlankReq && intState.vBlank) {
 		RST_INT<0x0040, 0b00000001>();
-	} else if (intE & intF & 0b00000010) {
+	} else if (intState.lcdStatReq && intState.lcdStat) {
 		throw std::runtime_error{"LCD stat interrupt"};
-	} else if (intE & intF & 0b00000100) {
+	} else if (intState.timerReq && intState.timer) {
 		throw std::runtime_error{"Timer interrupt"};
-	} else if (intE & intF & 0b00001000) {
+	} else if (intState.serialReq && intState.serial) {
 		throw std::runtime_error{"Serial interrupt"};
-	} else if (intE & intF & 0b00010000) {
+	} else if (intState.joypadReq && intState.joypad) {
 		throw std::runtime_error{"Joypad interrupt"};
 	}
 }
@@ -880,11 +878,11 @@ void CPU::PUSH(const WORD& reg) {
 }
 
 void CPU::EI() {
-	ime = true;
+	intState.ime = true;
 }
 
 void CPU::DI() {
-	ime = false;
+	intState.ime = false;
 }
 
 void CPU::RET() {
@@ -911,6 +909,6 @@ void CPU::RETncond(const bool& cond) {
 }
 
 void CPU::RETI() {
-	ime = true;
+	intState.ime = true;
 	RET();
 }

@@ -12,9 +12,10 @@ std::ostream& operator<<(std::ostream& os, const GPU::Mode& mode) {
 	}
 }
 
-GPU::GPU(Display& display_) :
+GPU::GPU(Display& display_, InterruptState& intState_) :
 	pixelArray{{0}},
 	display{display_},
+	intState{intState_},
 	cycleCount{0},
 	mode{Mode::HBlank},
 	vram{{0}},
@@ -40,13 +41,9 @@ GPU::GPU(Display& display_) :
 	wY{0},
 	wX{0}
 {
-	(void)lcdStat;
-	(void)lYC;
 	(void)dma;
-	(void)obp0;
-	(void)obp1;
+	(void)lYC;
 	(void)wX;
-	(void)bgp;
 }
 
 // See: http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-GPU-Timings
@@ -80,6 +77,7 @@ void GPU::step(DWORD cycles) {
 			// TODO: 144 or 143???
 			if (lY == 144) {
 				mode = Mode::VBlank;
+				intState.vBlank = true;
 				display.render(pixelArray);
 			} else {
 				mode = Mode::AccessingOAM;

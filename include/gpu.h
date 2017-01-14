@@ -4,10 +4,11 @@
 #include "types.h"
 #include "bitref.h"
 #include "display.h"
+#include "interruptstate.h"
 
 class GPU {
 	public:
-		GPU(Display&);
+		GPU(Display&, InterruptState&);
 		void step(DWORD);
 		void writeByte(WORD, BYTE);
 		BYTE readByte(WORD);
@@ -36,6 +37,7 @@ class GPU {
 		static const int HEIGHT = 144;
 		std::array<DWORD, WIDTH * HEIGHT> pixelArray;
 		Display& display;
+		InterruptState& intState;
 
 		void renderScanline();
 		void renderTiles();

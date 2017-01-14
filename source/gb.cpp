@@ -8,6 +8,7 @@
 #include "mmu.h"
 #include "cpu.h"
 #include "gpu.h"
+#include "interruptstate.h"
 
 template <typename Fun>
 struct ScopeGuard {
@@ -32,14 +33,15 @@ int main(int argc, char *argv[]) {
 	SDL_Event ev = { 0 };
 
 	try {
+		InterruptState intState{};
 		Display display{};
-		GPU gpu{display};
+		GPU gpu{display, intState};
 		auto mapper = Mapper::fromFile(argv[1]);
-		MMU mmu{std::move(mapper), gpu};
-		CPU cpu{mmu, 0x0104};
+		MMU mmu{std::move(mapper), gpu, intState};
+		CPU cpu{mmu, intState, 0x0104};
 
 		while (!quit) {
-			cpu.interrupt();
+			cpu.handleInterrupts();
 			DWORD cycles = cpu.step();
 			gpu.step(cycles);
 			//std::cin.get();
