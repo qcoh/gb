@@ -199,6 +199,9 @@ void GPU::renderScanline() {
 	if (bgDisplay) {
 		renderTiles();
 	}
+	if (objEnable) {
+		renderSprites();
+	}
 }
 
 void GPU::renderTiles() {
@@ -286,4 +289,50 @@ DWORD GPU::paletteColor(int c) {
 }
 
 void GPU::renderSprites() {
+	for (BYTE i = 0; i < 40; i++) {
+		BYTE spriteIndex = static_cast<BYTE>(i << 2);
+		BYTE ypos = static_cast<BYTE>(oam[spriteIndex] - 16);
+		BYTE xpos = static_cast<BYTE>(oam[spriteIndex + 1] - 8);
+		BYTE tileLocation = oam[spriteIndex + 2];
+		BYTE attributes = oam[spriteIndex + 3];
+
+		BYTE height = (objSize) ? 16 : 8;
+		if ((lY >= ypos) && (lY < (ypos + height))) {
+			int line = lY - ypos;
+
+			if (attributes & 0b01000000) {
+				line -= height;
+				line *= -1;
+			}
+			line *= 2;
+
+			WORD dataAddr = static_cast<WORD>(0x8000 + (tileLocation * 16) + line);
+			BYTE data0 = readByte(dataAddr);
+			BYTE data1 = readByte(static_cast<WORD>(dataAddr + 1));
+
+			for (int pixel = 7; pixel >= 0; pixel--) {
+				int colorBit = pixel;
+				
+				if (attributes & 0b00100000) {
+					colorBit -= 7;
+					colorBit *= -1;
+				}
+
+				int colorNum = (((data1 >> colorBit) << 1) & 0x2) | ((data0 >> colorBit) & 0x1);
+				DWORD color = paletteColor(colorNum);
+
+				if (color == 0xffffffff) {
+					// white == transparent
+					continue;
+				}
+				
+				int pixelPos = xpos + 7 - pixel;
+
+				if (lY < 0 || lY > 143 || pixelPos < 0 || pixelPos > 159) {
+					throw std::runtime_error{"out of bounds"};
+				}
+				pixelArray[static_cast<DWORD>(pixelPos + 160 * lY)] = color;
+			}
+		}
+	}
 }
