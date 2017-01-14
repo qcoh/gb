@@ -13,12 +13,10 @@ class GPU {
 		void writeByte(WORD, BYTE);
 		BYTE readByte(WORD);
 
-		enum class Mode {
-			AccessingOAM,
-			AccessingVRAM,
-			HBlank,
-			VBlank,
-		};
+		static const BYTE ACCESSING_OAM = 0b10;
+		static const BYTE ACCESSING_VRAM = 0b11;
+		static const BYTE HBLANK = 0b00;
+		static const BYTE VBLANK = 0b01;
 
 		static const WORD LCD_CONTROL = 0xff40;
 		static const WORD LCD_STAT = 0xff41;
@@ -45,7 +43,6 @@ class GPU {
 		DWORD paletteColor(int);
 
 		DWORD cycleCount;
-		Mode mode;
 
 		std::array<BYTE, 0x2000> vram;
 		std::array<BYTE, 0xa0> oam;
@@ -62,7 +59,12 @@ class GPU {
 		BitRef<BYTE, 0> bgDisplay;
 
 		// 0xff41: LCD STAT
-		BYTE lcdStat;
+		BYTE lcdStat = 0;
+		BitRef<BYTE, 6> coincidenceInt{lcdStat};
+		BitRef<BYTE, 5> oamInt{lcdStat};
+		BitRef<BYTE, 4> vBlankInt{lcdStat};
+		BitRef<BYTE, 3> hBlankInt{lcdStat};
+		BitRef<BYTE, 2> coincidenceFlag{lcdStat};
 
 		// 0xff42: SCY Scroll Y
 		BYTE scY;

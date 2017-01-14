@@ -3,21 +3,11 @@
 #include <type_traits>
 #include "gpu.h"
 
-std::ostream& operator<<(std::ostream& os, const GPU::Mode& mode) {
-	switch (mode) {
-	case GPU::Mode::AccessingOAM: os << "AccesingOAM"; return os;
-	case GPU::Mode::AccessingVRAM: os << "AccesingVRAM"; return os;
-	case GPU::Mode::HBlank: os << "HBlank"; return os;
-	case GPU::Mode::VBlank: os << "VBlank"; return os;
-	}
-}
-
 GPU::GPU(Display& display_, InterruptState& intState_) :
 	pixelArray{{0}},
 	display{display_},
 	intState{intState_},
 	cycleCount{0},
-	mode{Mode::HBlank},
 	vram{{0}},
 	oam{{0}},
 	lcdControl{0},
@@ -50,47 +40,44 @@ GPU::GPU(Display& display_, InterruptState& intState_) :
 void GPU::step(DWORD cycles) {
 	cycleCount += cycles;
 
-	//std::cout << "Cycle count: " << std::dec << cycleCount << '\n';
-	//std::cout << "Mode: " << mode << '\n';
-
-	switch (mode) {
-	case Mode::AccessingOAM:
+	switch (lcdStat & 0b11) {
+	case ACCESSING_OAM:
 		if (cycleCount >= 80) {
 			cycleCount = 0;
-			mode = Mode::AccessingVRAM;
+			lcdStat = (lcdStat & 0b11111100) | ACCESSING_VRAM;
 		}
 		break;
-	case Mode::AccessingVRAM:
+	case ACCESSING_VRAM:
 		if (cycleCount >= 172) {
 			cycleCount = 0;
-			mode = Mode::HBlank;
+			lcdStat = (lcdStat & 0b11111100) | HBLANK;
 
 			//throw std::runtime_error{"Scanline"};
 			renderScanline();
 		}
 		break;
-	case Mode::HBlank:
+	case HBLANK:
 		if (cycleCount >= 204) {
 			cycleCount = 0;
 			lY++;
 
 			// TODO: 144 or 143???
 			if (lY == 144) {
-				mode = Mode::VBlank;
+				lcdStat = (lcdStat & 0b11111100) | VBLANK;
 				intState.vBlank = true;
 				display.render(pixelArray);
 			} else {
-				mode = Mode::AccessingOAM;
+				lcdStat = (lcdStat & 0b11111100) | ACCESSING_OAM;
 			}
 		}
 		break;
-	case Mode::VBlank:
+	case VBLANK:
 		if (cycleCount >= 456) {
 			cycleCount = 0;
 			lY++;
 
 			if (lY > 153) {
-				mode = Mode::AccessingOAM;
+				lcdStat = (lcdStat & 0b11111100) | ACCESSING_OAM;
 				lY = 0;
 			}
 		}
