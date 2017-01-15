@@ -235,6 +235,7 @@ void GPU::renderTiles() {
 		int color = (((lineData1 >> colorBit) << 1) & 0x2) | ((lineData0 >> colorBit) & 0x1);
 
 		if (lY > 143 || pixel > 159) {
+			continue;
 			throw std::runtime_error{"overflowing image"};
 		}
 
