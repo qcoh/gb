@@ -105,7 +105,11 @@ void GPU::writeByte(WORD addr, BYTE v) {
 			obp1 = v;
 			return;
 		case LCD_WY:
+			wY = v;
+			return;
 		case LCD_WX:
+			wX = v;
+			return;
 		default:
 			break;
 		}
@@ -148,7 +152,9 @@ BYTE GPU::readByte(WORD addr) {
 		case LCD_OBP1:
 			return obp1;
 		case LCD_WY:
+			return wY;
 		case LCD_WX:
+			return wX;
 		default:
 			break;
 		}
