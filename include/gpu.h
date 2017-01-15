@@ -42,21 +42,21 @@ class GPU {
 		void renderSprites();
 		DWORD paletteColor(int);
 
-		DWORD cycleCount;
+		DWORD cycleCount = 0;
 
 		std::array<BYTE, 0x2000> vram;
 		std::array<BYTE, 0xa0> oam;
 
 		// 0xff40: LCD Control register
-		BYTE lcdControl;
-		BitRef<BYTE, 7> lcdEnable;
-		BitRef<BYTE, 6> windowTileSelect;
-		BitRef<BYTE, 5> windowEnable;
-		BitRef<BYTE, 4> tileDataSelect;
-		BitRef<BYTE, 3> bgTileSelect;
-		BitRef<BYTE, 2> objSize;
-		BitRef<BYTE, 1> objEnable;
-		BitRef<BYTE, 0> bgDisplay;
+		BYTE lcdControl = 0;
+		BitRef<BYTE, 7> lcdEnable{lcdControl};
+		BitRef<BYTE, 6> windowTileSelect{lcdControl};
+		BitRef<BYTE, 5> windowEnable{lcdControl};
+		BitRef<BYTE, 4> tileDataSelect{lcdControl};
+		BitRef<BYTE, 3> bgTileSelect{lcdControl};
+		BitRef<BYTE, 2> objSize{lcdControl};
+		BitRef<BYTE, 1> objEnable{lcdControl};
+		BitRef<BYTE, 0> bgDisplay{lcdControl};
 
 		// 0xff41: LCD STAT
 		BYTE lcdStat = 0;
@@ -67,32 +67,32 @@ class GPU {
 		BitRef<BYTE, 2> coincidenceFlag{lcdStat};
 
 		// 0xff42: SCY Scroll Y
-		BYTE scY;
+		BYTE scY = 0;
 
 		// 0xff43: SCX Scroll X
-		BYTE scX;
+		BYTE scX = 0;
 
 		// 0xff44: LY current Y position
-		BYTE lY;
+		BYTE lY = 0;
 
 		// 0xff45: LYC LY compare
-		BYTE lYC;
+		BYTE lYC = 0;
 
 		// 0xff46: DMA transfer
-		BYTE dma;
+		BYTE dma = 0;
 
 		// 0xff47: BGP background palette data
-		BYTE bgp;
+		BYTE bgp = 0;
 
 		// 0xff48: OBP0 object palette 0 data
-		BYTE obp0;
+		BYTE obp0 = 0;
 
 		// 0xff49: OBP1 object palette 1 data
-		BYTE obp1;
+		BYTE obp1 = 0;
 
 		// 0xff4a: WY window Y position
-		BYTE wY;
+		BYTE wY = 0;
 
 		// 0xff4b: WX window X position
-		BYTE wX;
+		BYTE wX = 0;
 };

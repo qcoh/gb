@@ -13,40 +13,40 @@ class CPU {
 		DWORD step();
 		void handleInterrupts();
 	protected:
-		WORD breakpoint;
-		bool debugMode;
+		WORD breakpoint = 0;
+		bool debugMode = false;
 
 		IMMU& mmu;
 		InterruptState& intState;
 
-		WORD pc;
-		WORD sp;
+		WORD pc = 0;
+		WORD sp = 0;
 
-		WORD af;
-		WORD bc;
-		WORD de;
-		WORD hl;
+		WORD af = 0;
+		WORD bc = 0;
+		WORD de = 0;
+		WORD hl = 0;
 
-		BYTE& a;
-		BYTE& f;
-		BYTE& b;
-		BYTE& c;
-		BYTE& d;
-		BYTE& e;
-		BYTE& h;
-		BYTE& l;
+		BYTE& a{*(static_cast<BYTE*>(static_cast<void*>(&af)) + 1)};
+		BYTE& f{*(static_cast<BYTE*>(static_cast<void*>(&af)))};
+		BYTE& b{*(static_cast<BYTE*>(static_cast<void*>(&bc)) + 1)};
+		BYTE& c{*(static_cast<BYTE*>(static_cast<void*>(&bc)))};
+		BYTE& d{*(static_cast<BYTE*>(static_cast<void*>(&de)) + 1)};
+		BYTE& e{*(static_cast<BYTE*>(static_cast<void*>(&de)))};
+		BYTE& h{*(static_cast<BYTE*>(static_cast<void*>(&hl)) + 1)};
+		BYTE& l{*(static_cast<BYTE*>(static_cast<void*>(&hl)))};
 		
-		BitRef<BYTE, 7> zeroFlag;
-		BitRef<BYTE, 6> negFlag;
-		BitRef<BYTE, 5> halfFlag;
-		BitRef<BYTE, 4> carryFlag;
+		BitRef<BYTE, 7> zeroFlag{f};
+		BitRef<BYTE, 6> negFlag{f};
+		BitRef<BYTE, 5> halfFlag{f};
+		BitRef<BYTE, 4> carryFlag{f};
 
 		// immediate byte/word
-		BYTE n;
-		WORD nn;
+		BYTE n = 0;
+		WORD nn = 0;
 
 		// number of cycles of last instruction
-		DWORD cycles;
+		DWORD cycles = 0;
 
 		std::array<Instruction, 256> instructions;
 		std::array<Instruction, 256> extended;

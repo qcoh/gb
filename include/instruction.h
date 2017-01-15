@@ -5,9 +5,9 @@
 #include "types.h"
 
 struct Instruction {
-	BYTE opcode;
+	BYTE opcode = 0;
 	std::function<void(void)> f;
 	std::string description;
-	BYTE cycles;
-	BYTE offset;
+	BYTE cycles = 0;
+	BYTE offset = 0;
 };

@@ -24,10 +24,10 @@ class MMU : public IMMU {
 		GPU& gpu;
 		InterruptState& intState;
 
-		bool biosMode;
+		bool biosMode = true;
 
-		std::array<BYTE, 127> hram;
+		std::array<BYTE, 127> hram = {{ 0 }};
 
-		std::array<BYTE, 4096> wram0;
-		std::array<BYTE, 4096> wram1;
+		std::array<BYTE, 4096> wram0 = {{ 0 }};
+		std::array<BYTE, 4096> wram1 = {{ 0 }};
 };

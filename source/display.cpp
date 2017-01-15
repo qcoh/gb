@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include "display.h"
 
-Display::Display() : window{nullptr}, renderer{nullptr}, texture{nullptr} {
+Display::Display() {
 	if ((window = SDL_CreateWindow("gb", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 160, 144, 0)) == nullptr) {
 		throw std::runtime_error{SDL_GetError()};
 	}

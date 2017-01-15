@@ -7,29 +7,8 @@ GPU::GPU(Display& display_, InterruptState& intState_) :
 	pixelArray{{0}},
 	display{display_},
 	intState{intState_},
-	cycleCount{0},
 	vram{{0}},
-	oam{{0}},
-	lcdControl{0},
-	lcdEnable{lcdControl},
-	windowTileSelect{lcdControl},
-	windowEnable{lcdControl},
-	tileDataSelect{lcdControl},
-	bgTileSelect{lcdControl},
-	objSize{lcdControl},
-	objEnable{lcdControl},
-	bgDisplay{lcdControl},
-	lcdStat{0},
-	scY{0},
-	scX{0},
-	lY{0},
-	lYC{0},
-	dma{0},
-	bgp{0},
-	obp0{0},
-	obp1{0},
-	wY{0},
-	wX{0}
+	oam{{0}}
 {
 	(void)dma;
 	(void)lYC;

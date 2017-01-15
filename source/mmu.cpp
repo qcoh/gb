@@ -24,9 +24,7 @@ std::array<BYTE, 256> MMU::bios{{
 MMU::MMU(std::unique_ptr<Mapper>&& mapper_, GPU& gpu_, InterruptState& intState_) : 
 	mapper{std::move(mapper_)},
 	gpu{gpu_},
-	intState{intState_},
-	biosMode{true},
-	hram{{0}}
+	intState{intState_}
 {
 }
 
