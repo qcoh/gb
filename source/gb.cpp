@@ -1,6 +1,7 @@
 #include <iostream>
 #include <exception>
 #include <cstdio>
+#include <cstdlib>
 #include <memory>
 #include <SDL2/SDL.h>
 
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
 		GPU gpu{display, intState};
 		auto mapper = Mapper::fromFile(argv[1]);
 		MMU mmu{std::move(mapper), gpu, intState};
-		CPU cpu{mmu, intState, 0x0104};
+		CPU cpu{mmu, intState, static_cast<WORD>(strtoul(argv[2], NULL, 16))};
 
 		while (!quit) {
 			cpu.handleInterrupts();
