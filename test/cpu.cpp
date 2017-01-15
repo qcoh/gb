@@ -1274,6 +1274,7 @@ SCENARIO("Testing control-flow instructions", "[cpu]") {
 
 			THEN("pc == 0x9879") {
 				REQUIRE(cpu.getPC() == 0x9878);
+				REQUIRE(cpu.getSP() == 0xffff);
 			}
 		}
 		WHEN("Restarting") {

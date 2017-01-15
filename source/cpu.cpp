@@ -590,6 +590,7 @@ DWORD CPU::step() {
 			std::cout << " " << extended[n].description;
 		}
 		std::cout << "\n----\n\n";
+		std::cin.get();
 	}
 	op.f();
 	// note: some instructions have variable length cycles. these instructions have op.cylces == 0 and set the correct values themselves.
@@ -879,7 +880,7 @@ void CPU::RET() {
 	BYTE low = mmu.readByte(sp);
 	BYTE high = mmu.readByte(sp+1);
 	pc = static_cast<WORD>((high << 8) + low);
-	sp += 1;
+	sp += 2;
 }
 
 void CPU::RETcond(const bool& cond) {
