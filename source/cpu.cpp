@@ -262,7 +262,7 @@ CPU::CPU(IMMU& mmu_, InterruptState& intState_, WORD breakpoint_) :
 		{ 0xe6, std::bind(&CPU::AND,		this, std::cref(n)),			"AND A, n",	8, 1 },
 		{}, // 0xe7
 		{ 0xe8, std::bind<void(CPU::*)()>(&CPU::ADD, this), "ADD SP, n", 16, 1 },
-		{}, // 0xe9
+		{ 0xe9, std::bind(&CPU::JP,		this, true, std::cref(hl)),		"JP HL",	4, 0 }, // !!! docs say (HL) but this is wrong (and makes little sense)
 		{ 0xea, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{nn, mmu}, std::cref(a)),	"LD (nn), A",	16, 2 },
 		{}, // 0xeb
 		{}, // 0xec
