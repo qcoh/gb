@@ -780,9 +780,12 @@ void CPU::ADD(WORD& target, const WORD& source) {
 }
 
 void CPU::ADD(WORD& target, const BYTE& source) {
+	// see: http://forums.nesdev.com/viewtopic.php?p=42143#p42143
 	zeroFlag = false;
-	WORD w = static_cast<WORD>(source);
-	ADD(target, w);
+	negFlag = false;
+	halfFlag = ((((target & 0xf) + (source & 0xf)) & 0xf0) != 0);
+	carryFlag = ((((target & 0xff) + source) & 0xf00) != 0);
+	target = static_cast<WORD>(target + static_cast<char>(source));
 }
 
 void CPU::CCF() {

@@ -771,14 +771,36 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == false);
 			}
 		}
-		WHEN("adding n to sp") {
-			cpu.setSP(0x0fff);
+		WHEN("adding n to sp (1)") {
+			cpu.setSP(0x00ff);
 			cpu.setN(1);
 			cpu.call(0xe8);
 
-			THEN("sp == 0x1000, carryFlag == false, halfFlag == true") {
-				REQUIRE(cpu.getSP() == 0x1000);
-				REQUIRE(cpu.getCarry() == false);
+			THEN("sp == 0x0100, carryFlag == true, halfFlag == true") {
+				REQUIRE(cpu.getSP() == 0x0100);
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getHalf() == true);
+			}
+		}
+		WHEN("adding n to sp (2)") {
+			cpu.setSP(0x0010);
+			cpu.setN(0b11111111); // == -1 as signed byte
+			cpu.call(0xe8);
+
+			THEN("sp == 0x000f, carryFlag == false, halfFlag == false") {
+				REQUIRE(cpu.getSP() == 0x000f);
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getHalf() == false);
+			}
+		}
+		WHEN("adding n to sp (3)") {
+			cpu.setSP(0x00ff);
+			cpu.setN(0b11111111);
+			cpu.call(0xe8);
+
+			THEN("sp == 0x00fe, carryFlag == true, halfFlag == true") {
+				REQUIRE(cpu.getSP() == 0x00fe);
+				REQUIRE(cpu.getCarry() == true);
 				REQUIRE(cpu.getHalf() == true);
 			}
 		}
