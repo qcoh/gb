@@ -261,7 +261,7 @@ CPU::CPU(IMMU& mmu_, InterruptState& intState_, WORD breakpoint_) :
 		{ 0xe5, std::bind(&CPU::PUSH,		this, std::cref(hl)),			"PUSH HL",	16, 0 },
 		{ 0xe6, std::bind(&CPU::AND,		this, std::cref(n)),			"AND A, n",	8, 1 },
 		{}, // 0xe7
-		{ 0xe8, std::bind<void(CPU::*)(WORD&, const BYTE&)>(&CPU::ADD, this, std::ref(sp), std::cref(n)), "ADD SP, n", 16, 1 },
+		{ 0xe8, std::bind<void(CPU::*)()>(&CPU::ADD, this), "ADD SP, n", 16, 1 },
 		{}, // 0xe9
 		{ 0xea, std::bind(&CPU::LD<MemRef, BYTE>, this, MemRef{nn, mmu}, std::cref(a)),	"LD (nn), A",	16, 2 },
 		{}, // 0xeb
@@ -278,7 +278,7 @@ CPU::CPU(IMMU& mmu_, InterruptState& intState_, WORD breakpoint_) :
 		{ 0xf5, std::bind(&CPU::PUSH,		this, std::cref(af)),			"PUSH AF",	16, 0 },
 		{ 0xf6, std::bind(&CPU::OR,		this, std::cref(n)),			"OR A, n",	8, 1 },
 		{}, // 0xf7
-		{}, // 0xf8
+		{ 0xf8, std::bind(&CPU::LDadd,		this),					"LD HL, SP+n",	12, 1 },
 		{}, // 0xf9
 		{ 0xfa, std::bind(&CPU::LD<BYTE, MemRef>, this, std::ref(a), MemRef{nn, mmu}),	"LD A, (nn)",	16, 2 },
 		{ 0xfb, std::bind(&CPU::EI,		this),					"EI",		4, 0 },
@@ -779,13 +779,22 @@ void CPU::ADD(WORD& target, const WORD& source) {
 	target = static_cast<WORD>(temp);
 }
 
-void CPU::ADD(WORD& target, const BYTE& source) {
+void CPU::ADD() {
 	// see: http://forums.nesdev.com/viewtopic.php?p=42143#p42143
 	zeroFlag = false;
 	negFlag = false;
-	halfFlag = ((((target & 0xf) + (source & 0xf)) & 0xf0) != 0);
-	carryFlag = ((((target & 0xff) + source) & 0xf00) != 0);
-	target = static_cast<WORD>(target + static_cast<char>(source));
+	halfFlag = ((((sp & 0xf) + (n & 0xf)) & 0xf0) != 0);
+	carryFlag = ((((sp & 0xff) + n) & 0xf00) != 0);
+	sp = static_cast<WORD>(sp + static_cast<char>(n));
+}
+
+void CPU::LDadd() {
+	// see: http://forums.nesdev.com/viewtopic.php?p=42143#p42143
+	zeroFlag = false;
+	negFlag = false;
+	halfFlag = ((((sp & 0xf) + (n & 0xf)) & 0xf0) != 0);
+	carryFlag = ((((sp & 0xff) + n) & 0xf00) != 0);
+	hl = static_cast<WORD>(sp + static_cast<char>(n));
 }
 
 void CPU::CCF() {

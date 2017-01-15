@@ -66,6 +66,7 @@ class CPU {
 			target = source;
 			hl--;
 		}
+		void LDadd();
 
 		void POP(WORD&);
 		void PUSH(const WORD&);
@@ -120,7 +121,7 @@ class CPU {
 		void ADD(WORD&, const WORD&);
 
 		// mixed
-		void ADD(WORD&, const BYTE&);
+		void ADD();
 
 		template <typename T>
 		void INC(T& target) {

@@ -804,6 +804,17 @@ SCENARIO("Testing instructions", "[cpu]") {
 				REQUIRE(cpu.getHalf() == true);
 			}
 		}
+		WHEN("loading and adding to hl (1)") {
+			cpu.setSP(0x00ff);
+			cpu.setN(0b11111111);
+			cpu.call(0xf8);
+
+			THEN("hl == 0x00fe, carryFlag == true, halfFlag == true") {
+				REQUIRE(cpu.getHL() == 0x00fe);
+				REQUIRE(cpu.getCarry() == true);
+				REQUIRE(cpu.getHalf() == true);
+			}
+		}
 		WHEN("cpling") {
 			cpu.setA(0b10101010);
 			cpu.call(0x2f);
