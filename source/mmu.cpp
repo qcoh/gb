@@ -76,6 +76,8 @@ BYTE MMU::readByte(WORD addr) {
 		case 0x0040:
 			// video
 			return gpu.readByte(addr);
+		case 0x0060:
+			return 0;
 		case 0x0070:
 			switch (addr) {
 			case 0xff7f:
@@ -161,6 +163,9 @@ void MMU::writeByte(WORD addr, BYTE v) {
 				biosMode = false;
 				return;
 			}
+		case 0x0060:
+			// gbc, ignore
+			return;
 		case 0x0070:
 			switch (addr) {
 			case 0xff7f:

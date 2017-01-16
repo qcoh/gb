@@ -30,6 +30,8 @@ class GPU {
 		static const WORD LCD_OBP1 = 0xff49;
 		static const WORD LCD_WY = 0xff4a;
 		static const WORD LCD_WX = 0xff4b;
+
+		static const WORD LCD_VBK = 0xff4f; // gbc, unused
 	private:
 		static const int WIDTH = 160;
 		static const int HEIGHT = 144;
