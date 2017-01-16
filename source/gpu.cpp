@@ -69,6 +69,9 @@ void GPU::writeByte(WORD addr, BYTE v) {
 	case 0x8000:
 	case 0x9000:
 		m_vram[addr - 0x8000] = v;
+		if (addr < 0x9800) {
+			updateTiles(addr, v);
+		}
 		return;
 	case 0xf000:
 		if ((addr & 0xff00) == 0xfe00) {
@@ -306,4 +309,12 @@ void GPU::renderSprites() {
 			}
 		}
 	}
+}
+
+void GPU::updateTiles(WORD addr, BYTE v) {
+	WORD tileIndex = (addr & 0x1fff) >> 4;
+	BYTE rowIndex = static_cast<BYTE>(addr & 0x7);
+	BYTE bitIndex = static_cast<BYTE>(addr & 0x1);
+
+	tileMap[tileIndex][rowIndex][bitIndex] = v;
 }

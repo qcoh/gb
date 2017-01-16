@@ -41,11 +41,16 @@ class GPU {
 		void renderTiles();
 		void renderSprites();
 		DWORD paletteColor(int);
+		void updateTiles(WORD, BYTE);
 
 		DWORD m_cycleCount = 0;
 
 		std::array<BYTE, 0x2000> m_vram;
 		std::array<BYTE, 0xa0> m_oam;
+
+		using Row = std::array<BYTE, 2>;
+		using Tile = std::array<Row, 8>;
+		std::array<Tile, 384> tileMap;
 
 		// 0xff40: LCD Control register
 		BYTE m_lcdControl = 0;
