@@ -1,6 +1,5 @@
 #include <stdexcept>
 #include <iostream>
-#include <type_traits>
 #include "gpu.h"
 
 GPU::GPU(Display& display_, InterruptState& intState_) :
@@ -164,6 +163,7 @@ BYTE GPU::readByte(WORD addr) {
 		std::cout << "LCD register read: " << std::hex << +addr << '\n';
 		throw std::runtime_error{"LCD registers not implemented"};
 	default:
+		std::cout << std::hex << +addr << '\n';
 		throw std::runtime_error{"Out of bounds"};
 	}
 }
@@ -172,84 +172,50 @@ void GPU::renderScanline() {
 	if (m_bgDisplay) {
 		renderTiles();
 	}
-	if (m_objDisplayEnable) {
-		renderSprites();
-	}
+	//if (m_objDisplayEnable) {
+	//	renderSprites();
+	//}
 }
 
 void GPU::renderTiles() {
-	// see: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
-	bool unsig = true;
-	bool useWindow = m_windowDisplayEnable && (m_wY <= m_lY);
-
-
-	WORD tileData = 0;
-	if (m_bgwinTileDataSelect) {
-		tileData = 0x8000;
-	} else {
-		tileData = 0x8800;
-		unsig = false;
-	}
+	// http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
+	// http://bgb.bircd.org/pandocs.htm
+	// http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-Graphics
 	
-	WORD bgMemory = 0;
-	if (useWindow) {
-		bgMemory = (m_bgTileMapDisplaySelect) ? 0x9c00 : 0x9800;
-	} else {
-		bgMemory = (m_windowTileMapDisplaySelect) ? 0x9c00 : 0x9800;
+	WORD tileMapAddr = m_bgTileMapDisplaySelect ? 0x9c00 : 0x9800;
+
+	BYTE tileX = m_scX >> 3;
+	BYTE tileY = static_cast<BYTE>(((m_scY + m_lY) & 0xff) >> 3);
+	BYTE pixelOffsetX = m_scX & 0x7;
+	BYTE pixelOffsetY = static_cast<BYTE>((m_scY + m_lY) & 0x7);
+
+	WORD tileMapIndex = static_cast<WORD>(tileMapAddr + tileX + tileY * 32);
+	WORD tileDataIndex = readByte(tileMapIndex);
+
+	if (m_bgwinTileDataSelect) {
+		tileDataIndex = static_cast<BYTE>(static_cast<int8_t>(tileDataIndex) + 0x100);
 	}
 
-	BYTE ypos = 0;
-	if (!useWindow) {
-		ypos = m_scY + m_lY;
-	} else {
-		ypos = m_lY - m_scY;
-	}
+	for (BYTE pixel = 0; pixel < 160; pixel++) {
+		Row current = tileMap[tileDataIndex][pixelOffsetY];
 
-	WORD tileRow = static_cast<WORD>(((ypos >> 3) & 0xff) << 5);
+		int mask = (7 - (pixelOffsetX & 0x7));
+		BYTE colorIndex = static_cast<BYTE>(((current[0] >> mask) & 0x1) + (((current[1] >> mask) & 0x1) << 1));
 
-	for (int pixel = 0; pixel < 160; pixel++) {
-		BYTE xpos = static_cast<BYTE>(pixel + m_scX);
+		m_pixelArray[pixel + 160 * m_lY] = paletteColor(colorIndex);
 
-		if (useWindow) {
-			if (pixel >= m_wX) {
-				xpos = static_cast<BYTE>(pixel - m_wX);
+		pixelOffsetX = static_cast<BYTE>(pixelOffsetX + 1);
+		if (pixelOffsetX == 8) {
+			pixelOffsetX = 0;
+			// next tile
+			tileMapIndex = static_cast<WORD>(tileMapIndex + 1);
+			tileDataIndex = readByte(tileMapIndex);
+
+			if (m_bgwinTileDataSelect) {
+				tileDataIndex = static_cast<BYTE>(static_cast<int8_t>(tileDataIndex) + 0x100);
 			}
 		}
-
-		WORD tileColumn = xpos >> 3;
-		WORD tileAddr = bgMemory + tileRow + tileColumn;
-		WORD tileLocation = tileData;
-		
-		int16_t tileNo = 0;
-
-		if (unsig) {
-			tileNo = readByte(tileAddr);
-			tileLocation += tileNo * 16;
-		} else {
-			tileNo = static_cast<int8_t>(readByte(tileAddr));
-			tileLocation += (tileNo + 128) * 16;
-		}
-
-		BYTE currentLine = static_cast<BYTE>((ypos & 0x7) << 1);
-		BYTE lineData0 = readByte(static_cast<WORD>(tileLocation + currentLine));
-		BYTE lineData1 = readByte(static_cast<WORD>(tileLocation + currentLine + 1));
-
-		int colorBit = ((xpos & 0x7) - 7) * (-1);
-		int color = (((lineData1 >> colorBit) << 1) & 0x2) | ((lineData0 >> colorBit) & 0x1);
-
-		if (m_lY > 143 || pixel > 159) {
-			continue;
-			throw std::runtime_error{"overflowing image"};
-		}
-
-		m_pixelArray[static_cast<DWORD>(pixel + 160 * m_lY)] = paletteColor(color);
 	}
-
-	// printf debugging
-	//for (unsigned i = 0; i < 160; i++) {
-	//	std::cout << std::hex << +m_display[160 * m_lY + i] << " ";
-	//}
-	//std::cout << '\n';
 }
 
 DWORD GPU::paletteColor(int c) {
@@ -313,7 +279,7 @@ void GPU::renderSprites() {
 
 void GPU::updateTiles(WORD addr, BYTE v) {
 	WORD tileIndex = (addr & 0x1fff) >> 4;
-	BYTE rowIndex = static_cast<BYTE>(addr & 0x7);
+	BYTE rowIndex = static_cast<BYTE>((addr >> 1) & 0x7);
 	BYTE bitIndex = static_cast<BYTE>(addr & 0x1);
 
 	tileMap[tileIndex][rowIndex][bitIndex] = v;
