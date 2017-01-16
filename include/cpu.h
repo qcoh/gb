@@ -1,6 +1,6 @@
 #pragma once
 
-#include "immu.h"
+#include "mmu.h"
 #include "types.h"
 #include "instruction.h"
 #include "bitref.h"
@@ -13,43 +13,43 @@ class CPU {
 		DWORD step();
 		void handleInterrupts();
 	protected:
-		WORD breakpoint = 0;
-		bool debugMode = false;
+		WORD m_breakpoint = 0;
+		bool m_debugMode = false;
 
-		IMMU& mmu;
-		InterruptState& intState;
+		IMMU& m_mmu;
+		InterruptState& m_intState;
 
-		WORD pc = 0;
-		WORD sp = 0;
+		WORD m_pc = 0;
+		WORD m_sp = 0;
 
-		WORD af = 0;
-		WORD bc = 0;
-		WORD de = 0;
-		WORD hl = 0;
+		WORD m_af = 0;
+		WORD m_bc = 0;
+		WORD m_de = 0;
+		WORD m_hl = 0;
 
-		BYTE& a{*(static_cast<BYTE*>(static_cast<void*>(&af)) + 1)};
-		BYTE& f{*(static_cast<BYTE*>(static_cast<void*>(&af)))};
-		BYTE& b{*(static_cast<BYTE*>(static_cast<void*>(&bc)) + 1)};
-		BYTE& c{*(static_cast<BYTE*>(static_cast<void*>(&bc)))};
-		BYTE& d{*(static_cast<BYTE*>(static_cast<void*>(&de)) + 1)};
-		BYTE& e{*(static_cast<BYTE*>(static_cast<void*>(&de)))};
-		BYTE& h{*(static_cast<BYTE*>(static_cast<void*>(&hl)) + 1)};
-		BYTE& l{*(static_cast<BYTE*>(static_cast<void*>(&hl)))};
+		BYTE& a{*(static_cast<BYTE*>(static_cast<void*>(&m_af)) + 1)};
+		BYTE& f{*(static_cast<BYTE*>(static_cast<void*>(&m_af)))};
+		BYTE& b{*(static_cast<BYTE*>(static_cast<void*>(&m_bc)) + 1)};
+		BYTE& c{*(static_cast<BYTE*>(static_cast<void*>(&m_bc)))};
+		BYTE& d{*(static_cast<BYTE*>(static_cast<void*>(&m_de)) + 1)};
+		BYTE& e{*(static_cast<BYTE*>(static_cast<void*>(&m_de)))};
+		BYTE& h{*(static_cast<BYTE*>(static_cast<void*>(&m_hl)) + 1)};
+		BYTE& l{*(static_cast<BYTE*>(static_cast<void*>(&m_hl)))};
 		
-		BitRef<BYTE, 7> zeroFlag{f};
-		BitRef<BYTE, 6> negFlag{f};
-		BitRef<BYTE, 5> halfFlag{f};
-		BitRef<BYTE, 4> carryFlag{f};
+		BitRef<BYTE, 7> m_zeroFlag{f};
+		BitRef<BYTE, 6> m_negFlag{f};
+		BitRef<BYTE, 5> m_halfFlag{f};
+		BitRef<BYTE, 4> m_carryFlag{f};
 
 		// immediate byte/word
 		BYTE n = 0;
 		WORD nn = 0;
 
 		// number of cycles of last instruction
-		DWORD cycles = 0;
+		DWORD m_cycles = 0;
 
-		std::array<Instruction, 256> instructions;
-		std::array<Instruction, 256> extended;
+		std::array<Instruction, 256> m_instructions;
+		std::array<Instruction, 256> m_extended;
 
 		// loads
 		template <typename T, typename S>
@@ -59,12 +59,12 @@ class CPU {
 		template <typename T, typename S>
 		void LDI(T& target, const S& source) {
 			target = source;
-			hl++;
+			m_hl++;
 		}
 		template <typename T, typename S>
 		void LDD(T& target, const S& source) {
 			target = source;
-			hl--;
+			m_hl--;
 		}
 		void LDadd();
 
@@ -85,21 +85,21 @@ class CPU {
 
 		template <WORD addr>
 		void RST() {
-			mmu.writeByte(sp-1, static_cast<BYTE>(pc >> 8));
-			mmu.writeByte(sp-2, static_cast<BYTE>(pc));
-			pc = addr;
-			sp -= 2;
+			m_mmu.writeByte(m_sp-1, static_cast<BYTE>(m_pc >> 8));
+			m_mmu.writeByte(m_sp-2, static_cast<BYTE>(m_pc));
+			m_pc = addr;
+			m_sp -= 2;
 		}
 		template <WORD addr, BYTE mask>
 		void RST_INT() {
-			intState.ime = false;
-			mmu.writeByte(sp-1, static_cast<BYTE>(pc >> 8));
-			mmu.writeByte(sp-2, static_cast<BYTE>(pc));
-			pc = addr;
-			sp -= 2;
+			m_intState.ime = false;
+			m_mmu.writeByte(m_sp-1, static_cast<BYTE>(m_pc >> 8));
+			m_mmu.writeByte(m_sp-2, static_cast<BYTE>(m_pc));
+			m_pc = addr;
+			m_sp -= 2;
 
 			// disable flag
-			intState.intFlag ^= mask;
+			m_intState.intFlag ^= mask;
 		}
 
 		// 8bit arithmetic
@@ -125,10 +125,10 @@ class CPU {
 
 		template <typename T>
 		void INC(T& target) {
-			halfFlag = ((((target & 0xf) + 1) & 0xf0) != 0);
+			m_halfFlag = ((((target & 0xf) + 1) & 0xf0) != 0);
 			target = static_cast<BYTE>(target + 1);
-			zeroFlag = (target == 0);
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_negFlag = false;
 		}
 		// Highly annoying: Can't specialize in class scope (for no apparent reason: https://cplusplus.github.io/EWG/ewg-active.html#41)
 		// template <>
@@ -138,10 +138,10 @@ class CPU {
 
 		template <typename T>
 		void DEC(T& target) {
-			halfFlag = ((target & 0xf) == 0);
+			m_halfFlag = ((target & 0xf) == 0);
 			target = static_cast<BYTE>(target - 1);
-			zeroFlag = (target == 0);
-			negFlag = true;
+			m_zeroFlag = (target == 0);
+			m_negFlag = true;
 		}
 		// template <>
 		void DEC(WORD& target) {
@@ -162,83 +162,83 @@ class CPU {
 		// extended instruction set
 		template <typename T>
 		void RLC(T& target) {
-			carryFlag = ((target >> 7) != 0);
-			target = static_cast<BYTE>(static_cast<BYTE>(target << 1) | carryFlag);
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_carryFlag = ((target >> 7) != 0);
+			target = static_cast<BYTE>(static_cast<BYTE>(target << 1) | m_carryFlag);
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void RRC(T& target) {
-			carryFlag = ((target & 0x1) != 0);
-			target = static_cast<BYTE>(static_cast<BYTE>(target >> 1) | (carryFlag << 7));
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_carryFlag = ((target & 0x1) != 0);
+			target = static_cast<BYTE>(static_cast<BYTE>(target >> 1) | (m_carryFlag << 7));
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void RL(T& target) {
-			bool temp = carryFlag;
-			carryFlag = ((target >> 7) != 0);
+			bool temp = m_carryFlag;
+			m_carryFlag = ((target >> 7) != 0);
 			target = static_cast<BYTE>((target << 1) | temp);
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void RR(T& target) {
-			bool temp = carryFlag;
-			carryFlag = ((target & 0x1) != 0);
+			bool temp = m_carryFlag;
+			m_carryFlag = ((target & 0x1) != 0);
 			target = static_cast<BYTE>((target >> 1) | (temp << 7));
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void SLA(T& target) {
-			carryFlag = ((target >> 7) != 0);
+			m_carryFlag = ((target >> 7) != 0);
 			target = static_cast<BYTE>(target << 1);
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void SRA(T& target) {
-			carryFlag = ((target & 0x1) != 0);
+			m_carryFlag = ((target & 0x1) != 0);
 			target = static_cast<BYTE>((target >> 1) | (target & 0b10000000));
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void SWAP(T& target) {
 			target = static_cast<BYTE>((target >> 4) | (target << 4));
-			zeroFlag = (target == 0);
-			carryFlag = false;
-			halfFlag = false;
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_carryFlag = false;
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void SRL(T& target) {
-			carryFlag = ((target & 0x1) != 0);
+			m_carryFlag = ((target & 0x1) != 0);
 			target = static_cast<BYTE>(target >> 1);
-			zeroFlag = (target == 0);
-			halfFlag = false;
-			negFlag = false;
+			m_zeroFlag = (target == 0);
+			m_halfFlag = false;
+			m_negFlag = false;
 		}
 
 		template <typename T>
 		void BIT(const T& target) {
-			zeroFlag = !target;
-			negFlag = false;
-			halfFlag = true;
+			m_zeroFlag = !target;
+			m_negFlag = false;
+			m_halfFlag = true;
 		}
 
 		template <typename T>

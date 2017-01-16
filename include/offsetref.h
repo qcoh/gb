@@ -6,20 +6,20 @@
 template <WORD offset>
 class OffsetRef {
 	public:
-		OffsetRef(const BYTE& addr_, IMMU& mmu_) : addr{addr_}, mmu{mmu_} {}
+		OffsetRef(const BYTE& addr, IMMU& mmu) : m_addr{addr}, m_mmu{mmu} {}
 
 		OffsetRef(const OffsetRef&) = default;
 		OffsetRef& operator=(const OffsetRef&) = delete;
 		virtual ~OffsetRef() = default;
 
 		operator BYTE () const {
-			return mmu.readByte(static_cast<WORD>(addr + offset));
+			return m_mmu.readByte(static_cast<WORD>(m_addr + offset));
 		}
 
 		void operator=(BYTE rhs) {
-			mmu.writeByte(static_cast<WORD>(addr + offset), rhs);
+			m_mmu.writeByte(static_cast<WORD>(m_addr + offset), rhs);
 		}
 	private:
-		const BYTE& addr;
-		IMMU& mmu;
+		const BYTE& m_addr;
+		IMMU& m_mmu;
 };

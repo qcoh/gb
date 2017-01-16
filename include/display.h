@@ -11,7 +11,7 @@ class Display {
 		void render(PixelArray&);
 		~Display();
 	private:
-		SDL_Window* window = nullptr;
-		SDL_Renderer* renderer = nullptr;
-		SDL_Texture* texture = nullptr;
+		SDL_Window* m_window = nullptr;
+		SDL_Renderer* m_renderer = nullptr;
+		SDL_Texture* m_texture = nullptr;
 };

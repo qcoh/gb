@@ -1,11 +1,11 @@
 #include <stdexcept>
 #include "romonly.h"
 
-RomOnly::RomOnly(std::vector<BYTE>&& rom_) : Mapper{std::move(rom_)} {
+RomOnly::RomOnly(std::vector<BYTE>&& rom) : Mapper{std::move(rom)} {
 }
 
 BYTE RomOnly::readByte(WORD addr) {
-	return rom[addr];
+	return m_rom[addr];
 }
 
 void RomOnly::writeByte(WORD addr, BYTE v) {

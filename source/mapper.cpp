@@ -5,7 +5,7 @@
 #include "mapper.h"
 #include "romonly.h"
 
-Mapper::Mapper(std::vector<BYTE>&& rom_) : rom{std::move(rom_)} {
+Mapper::Mapper(std::vector<BYTE>&& rom) : m_rom{std::move(rom)} {
 }
 
 std::unique_ptr<Mapper> Mapper::fromFile(const std::string& path) {

@@ -1,16 +1,16 @@
 #include "memref.h"
 
-MemRef::MemRef(const WORD& addr_, IMMU& mmu_) : addr{addr_}, mmu{mmu_} {
+MemRef::MemRef(const WORD& addr, IMMU& mmu) : m_addr{addr}, m_mmu{mmu} {
 }
 
 MemRef::operator BYTE () const {
-	return mmu.readByte(addr);
+	return m_mmu.readByte(m_addr);
 }
 
 void MemRef::operator=(BYTE rhs) {
-	mmu.writeByte(addr, rhs);
+	m_mmu.writeByte(m_addr, rhs);
 }
 
 void MemRef::operator=(WORD rhs) {
-	mmu.writeWord(addr, rhs);
+	m_mmu.writeWord(m_addr, rhs);
 }

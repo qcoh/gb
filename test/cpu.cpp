@@ -12,7 +12,7 @@ class TestCPU : public CPU {
 		}
 
 		void call(BYTE op) {
-			for (auto& in : instructions) {
+			for (auto& in : m_instructions) {
 				if (in.opcode == op) {
 					in.f();
 				}
@@ -20,11 +20,11 @@ class TestCPU : public CPU {
 		}
 
 		void setBC(WORD bc_) {
-			bc = bc_;
+			m_bc = bc_;
 		}
 
 		WORD getBC() {
-			return bc;
+			return m_bc;
 		}
 
 		void setNN(WORD nn_) {
@@ -60,43 +60,43 @@ class TestCPU : public CPU {
 		}
 
 		void setHL(WORD hl_) {
-			hl = hl_;
+			m_hl = hl_;
 		}
 
 		WORD getHL() {
-			return hl;
+			return m_hl;
 		}
 
 		void setSP(WORD sp_) {
-			sp = sp_;
+			m_sp = sp_;
 		}
 
 		WORD getSP() {
-			return sp;
+			return m_sp;
 		}
 
 		void setPC(WORD pc_) {
-			pc = pc_;
+			m_pc = pc_;
 		}
 
 		WORD getPC() {
-			return pc;
+			return m_pc;
 		}
 
-		auto getCarry() -> decltype(carryFlag)& {
-			return carryFlag;
+		auto getCarry() -> decltype(m_carryFlag)& {
+			return m_carryFlag;
 		}
 
-		auto getHalf() -> decltype(halfFlag)& {
-			return halfFlag;
+		auto getHalf() -> decltype(m_halfFlag)& {
+			return m_halfFlag;
 		}
 
-		auto getZero() -> decltype(zeroFlag)& {
-			return zeroFlag;
+		auto getZero() -> decltype(m_zeroFlag)& {
+			return m_zeroFlag;
 		}
 
-		auto getNeg() -> decltype(negFlag)& {
-			return negFlag;
+		auto getNeg() -> decltype(m_negFlag)& {
+			return m_negFlag;
 		}
 };
 

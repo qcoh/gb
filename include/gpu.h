@@ -33,66 +33,66 @@ class GPU {
 	private:
 		static const int WIDTH = 160;
 		static const int HEIGHT = 144;
-		std::array<DWORD, WIDTH * HEIGHT> pixelArray;
-		Display& display;
-		InterruptState& intState;
+		std::array<DWORD, WIDTH * HEIGHT> m_pixelArray;
+		Display& m_display;
+		InterruptState& m_intState;
 
 		void renderScanline();
 		void renderTiles();
 		void renderSprites();
 		DWORD paletteColor(int);
 
-		DWORD cycleCount = 0;
+		DWORD m_cycleCount = 0;
 
-		std::array<BYTE, 0x2000> vram;
-		std::array<BYTE, 0xa0> oam;
+		std::array<BYTE, 0x2000> m_vram;
+		std::array<BYTE, 0xa0> m_oam;
 
 		// 0xff40: LCD Control register
-		BYTE lcdControl = 0;
-		BitRef<BYTE, 7> lcdEnable{lcdControl};
-		BitRef<BYTE, 6> windowTileSelect{lcdControl};
-		BitRef<BYTE, 5> windowEnable{lcdControl};
-		BitRef<BYTE, 4> tileDataSelect{lcdControl};
-		BitRef<BYTE, 3> bgTileSelect{lcdControl};
-		BitRef<BYTE, 2> objSize{lcdControl};
-		BitRef<BYTE, 1> objEnable{lcdControl};
-		BitRef<BYTE, 0> bgDisplay{lcdControl};
+		BYTE m_lcdControl = 0;
+		BitRef<BYTE, 7> m_lcdEnable{m_lcdControl};
+		BitRef<BYTE, 6> m_windowTileSelect{m_lcdControl};
+		BitRef<BYTE, 5> m_windowEnable{m_lcdControl};
+		BitRef<BYTE, 4> m_tileDataSelect{m_lcdControl};
+		BitRef<BYTE, 3> m_bgTileSelect{m_lcdControl};
+		BitRef<BYTE, 2> m_objSize{m_lcdControl};
+		BitRef<BYTE, 1> m_objEnable{m_lcdControl};
+		BitRef<BYTE, 0> m_bgDisplay{m_lcdControl};
 
 		// 0xff41: LCD STAT
-		BYTE lcdStat = 0;
-		BitRef<BYTE, 6> coincidenceInt{lcdStat};
-		BitRef<BYTE, 5> oamInt{lcdStat};
-		BitRef<BYTE, 4> vBlankInt{lcdStat};
-		BitRef<BYTE, 3> hBlankInt{lcdStat};
-		BitRef<BYTE, 2> coincidenceFlag{lcdStat};
+		BYTE m_lcdStat = 0;
+		BitRef<BYTE, 6> m_coincidenceInt{m_lcdStat};
+		BitRef<BYTE, 5> m_oamInt{m_lcdStat};
+		BitRef<BYTE, 4> m_vBlankInt{m_lcdStat};
+		BitRef<BYTE, 3> m_hBlankInt{m_lcdStat};
+		BitRef<BYTE, 2> m_coincidenceFlag{m_lcdStat};
 
 		// 0xff42: SCY Scroll Y
-		BYTE scY = 0;
+		BYTE m_scY = 0;
 
 		// 0xff43: SCX Scroll X
-		BYTE scX = 0;
+		BYTE m_scX = 0;
 
 		// 0xff44: LY current Y position
-		BYTE lY = 0;
+		BYTE m_lY = 0;
 
 		// 0xff45: LYC LY compare
-		BYTE lYC = 0;
+		BYTE m_lYC = 0;
 
 		// 0xff46: DMA transfer
-		BYTE dma = 0;
+		BYTE m_dma = 0;
 
 		// 0xff47: BGP background palette data
-		BYTE bgp = 0;
+		BYTE m_bgp = 0;
 
 		// 0xff48: OBP0 object palette 0 data
-		BYTE obp0 = 0;
+		BYTE m_obp0 = 0;
 
 		// 0xff49: OBP1 object palette 1 data
-		BYTE obp1 = 0;
+		BYTE m_obp1 = 0;
 
 		// 0xff4a: WY window Y position
-		BYTE wY = 0;
+		BYTE m_wY = 0;
 
 		// 0xff4b: WX window X position
-		BYTE wX = 0;
+		BYTE m_wX = 0;
 };

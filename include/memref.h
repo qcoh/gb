@@ -16,6 +16,6 @@ class MemRef {
 		void operator=(BYTE);
 		void operator=(WORD);
 	private:
-		const WORD& addr;
-		IMMU& mmu;
+		const WORD& m_addr;
+		IMMU& m_mmu;
 };
