@@ -169,7 +169,7 @@ void GPU::renderScanline() {
 	if (m_bgDisplay) {
 		renderTiles();
 	}
-	if (m_objEnable) {
+	if (m_objDisplayEnable) {
 		renderSprites();
 	}
 }
@@ -177,11 +177,11 @@ void GPU::renderScanline() {
 void GPU::renderTiles() {
 	// see: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
 	bool unsig = true;
-	bool useWindow = m_windowEnable && (m_wY <= m_lY);
+	bool useWindow = m_windowDisplayEnable && (m_wY <= m_lY);
 
 
 	WORD tileData = 0;
-	if (m_tileDataSelect) {
+	if (m_bgwinTileDataSelect) {
 		tileData = 0x8000;
 	} else {
 		tileData = 0x8800;
@@ -190,9 +190,9 @@ void GPU::renderTiles() {
 	
 	WORD bgMemory = 0;
 	if (useWindow) {
-		bgMemory = (m_bgTileSelect) ? 0x9c00 : 0x9800;
+		bgMemory = (m_bgTileMapDisplaySelect) ? 0x9c00 : 0x9800;
 	} else {
-		bgMemory = (m_windowTileSelect) ? 0x9c00 : 0x9800;
+		bgMemory = (m_windowTileMapDisplaySelect) ? 0x9c00 : 0x9800;
 	}
 
 	BYTE ypos = 0;

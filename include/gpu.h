@@ -49,13 +49,13 @@ class GPU {
 
 		// 0xff40: LCD Control register
 		BYTE m_lcdControl = 0;
-		BitRef<BYTE, 7> m_lcdEnable{m_lcdControl};
-		BitRef<BYTE, 6> m_windowTileSelect{m_lcdControl};
-		BitRef<BYTE, 5> m_windowEnable{m_lcdControl};
-		BitRef<BYTE, 4> m_tileDataSelect{m_lcdControl};
-		BitRef<BYTE, 3> m_bgTileSelect{m_lcdControl};
+		BitRef<BYTE, 7> m_displayEnable{m_lcdControl};
+		BitRef<BYTE, 6> m_windowTileMapDisplaySelect{m_lcdControl};
+		BitRef<BYTE, 5> m_windowDisplayEnable{m_lcdControl};
+		BitRef<BYTE, 4> m_bgwinTileDataSelect{m_lcdControl};
+		BitRef<BYTE, 3> m_bgTileMapDisplaySelect{m_lcdControl};
 		BitRef<BYTE, 2> m_objSize{m_lcdControl};
-		BitRef<BYTE, 1> m_objEnable{m_lcdControl};
+		BitRef<BYTE, 1> m_objDisplayEnable{m_lcdControl};
 		BitRef<BYTE, 0> m_bgDisplay{m_lcdControl};
 
 		// 0xff41: LCD STAT
