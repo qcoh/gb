@@ -237,56 +237,34 @@ DWORD GPU::paletteColor(BYTE palette, BYTE index) {
 }
 
 void GPU::renderSprites() {
+	// http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-Sprites
+	for (const auto& attr : m_attributes) {
+		BYTE xpos = static_cast<BYTE>(attr[1] + 8);
+		BYTE ypos = static_cast<BYTE>(attr[0] + 16);
 
-#if 0
-	for (BYTE i = 0; i < 40; i++) {
-		BYTE spriteIndex = static_cast<BYTE>(i << 2);
-		BYTE ypos = static_cast<BYTE>(m_oam[spriteIndex] - 16);
-		BYTE xpos = static_cast<BYTE>(m_oam[spriteIndex + 1] - 8);
-		BYTE tileLocation = m_oam[spriteIndex + 2];
-		BYTE attributes = m_oam[spriteIndex + 3];
+		// scanline does not intersect sprite
+		if (!(ypos <= m_lY && m_lY < ypos + 8)) {
+			continue;
+		}
 
-		BYTE height = (m_objSize) ? 16 : 8;
-		if ((m_lY >= ypos) && (m_lY < (ypos + height))) {
-			int line = m_lY - ypos;
+		BYTE palette = ((attr[3] & 0b00010000) == 0) ? m_obp0 : m_obp1;
 
-			if (attributes & 0b01000000) {
-				line -= height;
-				line *= -1;
-			}
-			line *= 2;
+		BYTE spriteRow = static_cast<BYTE>(((attr[3] & 0b0100000) == 0) ? 7 - m_lY + ypos : m_lY - ypos);
+		Row current = tileMap[attr[2]][spriteRow];
 
-			WORD dataAddr = static_cast<WORD>(0x8000 + (tileLocation * 16) + line);
-			BYTE data0 = readByte(dataAddr);
-			BYTE data1 = readByte(static_cast<WORD>(dataAddr + 1));
+		for (BYTE x = 0; x < 8; x++) {
+			if ((xpos + x) < 160) {
+				// TODO: priority/transparency
+				int mask = (attr[3] & 0b0010000) ? 7 - ((xpos + x) & 0x7) : (xpos + x) & 0x7;
+				BYTE colorIndex = static_cast<BYTE>(((current[0] >> mask) & 0x1) + (((current[1] >> mask) & 0x1) << 1));
 
-			for (int pixel = 7; pixel >= 0; pixel--) {
-				int colorBit = pixel;
-				
-				if (attributes & 0b00100000) {
-					colorBit -= 7;
-					colorBit *= -1;
+				DWORD color = paletteColor(palette, colorIndex);
+				if (color != 0xff000000) {
+					m_pixelArray[xpos + x + 160 * m_lY] = color;
 				}
-
-				int colorNum = (((data1 >> colorBit) << 1) & 0x2) | ((data0 >> colorBit) & 0x1);
-				DWORD color = paletteColor(colorNum);
-
-				if (color == 0xffffffff) {
-					// white == transparent
-					continue;
-				}
-				
-				int pixelPos = xpos + 7 - pixel;
-
-				if (m_lY < 0 || m_lY > 143 || pixelPos < 0 || pixelPos > 159) {
-					throw std::runtime_error{"out of bounds"};
-				}
-				m_pixelArray[static_cast<DWORD>(pixelPos + 160 * m_lY)] = color;
-
 			}
 		}
 	}
-#endif
 }
 
 void GPU::updateTiles(WORD addr, BYTE v) {
