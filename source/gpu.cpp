@@ -198,8 +198,8 @@ void GPU::renderTiles() {
 	WORD tileMapIndex = static_cast<WORD>(tileMapAddr + tileX + tileY * 32);
 	WORD tileDataIndex = readByte(tileMapIndex);
 
-	if (m_bgwinTileDataSelect) {
-		tileDataIndex = static_cast<BYTE>(static_cast<int8_t>(tileDataIndex) + 0x100);
+	if (!m_bgwinTileDataSelect) {
+		tileDataIndex = static_cast<WORD>(static_cast<int8_t>(tileDataIndex) + 256);
 	}
 
 	for (BYTE pixel = 0; pixel < 160; pixel++) {
@@ -217,8 +217,8 @@ void GPU::renderTiles() {
 			tileMapIndex = static_cast<WORD>(tileMapIndex + 1);
 			tileDataIndex = readByte(tileMapIndex);
 
-			if (m_bgwinTileDataSelect) {
-				tileDataIndex = static_cast<BYTE>(static_cast<int8_t>(tileDataIndex) + 0x100);
+			if (!m_bgwinTileDataSelect) {
+				tileDataIndex = static_cast<WORD>(static_cast<int8_t>(tileDataIndex) + 256);
 			}
 		}
 	}
