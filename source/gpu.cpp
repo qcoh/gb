@@ -76,6 +76,9 @@ void GPU::writeByte(WORD addr, BYTE v) {
 		if ((addr & 0xff00) == 0xfe00) {
 			// OAM
 			m_oam[addr - 0xfe00] = v;
+			if (addr < 0xfea0) {
+				updateAttributes(addr, v);
+			}
 			return;
 		}
 		switch (addr) {
@@ -292,4 +295,9 @@ void GPU::updateTiles(WORD addr, BYTE v) {
 	BYTE bitIndex = static_cast<BYTE>(addr & 0x1);
 
 	tileMap[tileIndex][rowIndex][bitIndex] = v;
+}
+
+void GPU::updateAttributes(WORD addr, BYTE v) {
+	WORD oaIndex = (addr & 0xff) >> 2;
+	m_attributes[oaIndex][addr & 0x3] = v;
 }
