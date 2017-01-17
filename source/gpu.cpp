@@ -178,9 +178,9 @@ void GPU::renderScanline() {
 	if (m_bgDisplay) {
 		renderTiles();
 	}
-	//if (m_objDisplayEnable) {
-	//	renderSprites();
-	//}
+	if (m_objDisplayEnable) {
+		renderSprites();
+	}
 }
 
 void GPU::renderTiles() {
@@ -208,7 +208,7 @@ void GPU::renderTiles() {
 		int mask = (7 - (pixelOffsetX & 0x7));
 		BYTE colorIndex = static_cast<BYTE>(((current[0] >> mask) & 0x1) + (((current[1] >> mask) & 0x1) << 1));
 
-		m_pixelArray[pixel + 160 * m_lY] = paletteColor(colorIndex);
+		m_pixelArray[pixel + 160 * m_lY] = paletteColor(m_bgp, colorIndex);
 
 		pixelOffsetX = static_cast<BYTE>(pixelOffsetX + 1);
 		if (pixelOffsetX == 8) {
@@ -224,9 +224,8 @@ void GPU::renderTiles() {
 	}
 }
 
-DWORD GPU::paletteColor(int c) {
-	c *= 2;
-	switch ((m_bgp >> c) & 0x3) {
+DWORD GPU::paletteColor(BYTE palette, BYTE index) {
+	switch ((palette >> (index << 1)) & 0x3) {
 	case 0: return 0xffffffff;
 	case 1: return 0xffc0c0c0;
 	case 2: return 0xff606060;
@@ -235,6 +234,8 @@ DWORD GPU::paletteColor(int c) {
 }
 
 void GPU::renderSprites() {
+
+#if 0
 	for (BYTE i = 0; i < 40; i++) {
 		BYTE spriteIndex = static_cast<BYTE>(i << 2);
 		BYTE ypos = static_cast<BYTE>(m_oam[spriteIndex] - 16);
@@ -278,9 +279,11 @@ void GPU::renderSprites() {
 					throw std::runtime_error{"out of bounds"};
 				}
 				m_pixelArray[static_cast<DWORD>(pixelPos + 160 * m_lY)] = color;
+
 			}
 		}
 	}
+#endif
 }
 
 void GPU::updateTiles(WORD addr, BYTE v) {
